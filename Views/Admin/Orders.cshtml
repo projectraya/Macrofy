@@ -1,0 +1,31 @@
+@model List<Macrofy.ViewModels.OrderViewModel>
+@{ ViewData["Title"] = "Всички поръчки"; }
+
+<div class="dash-page">
+  <div class="dash-header">
+    <div style="max-width:1200px;margin:0 auto">
+      <h1>Всички поръчки (@Model.Count)</h1>
+    </div>
+  </div>
+  <div class="dash-content">
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="orders-table">
+        <thead><tr><th>ID</th><th>Клиент</th><th>Готвач</th><th>Период</th><th>Статус</th><th>Цена</th><th>Дата</th></tr></thead>
+        <tbody>
+        @foreach (var o in Model)
+        {
+          <tr>
+            <td><strong>#@o.Id</strong></td>
+            <td>@o.ClientName</td>
+            <td>@o.ChefName</td>
+            <td style="font-size:.82rem">@o.StartDate.ToString("dd.MM") – @o.EndDate.ToString("dd.MM.yy")</td>
+            <td><span class="badge badge-@o.Status">@o.Status</span></td>
+            <td>@o.TotalPrice.ToString("F0") лв</td>
+            <td style="font-size:.82rem;color:var(--muted)">@o.CreatedAt.ToString("dd.MM.yy")</td>
+          </tr>
+        }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,48 @@
+@model List<Macrofy.Models.ChefProfile>
+@{ ViewData["Title"] = "Управление на готвачи"; }
+
+<div class="dash-page">
+  <div class="dash-header">
+    <div style="max-width:1200px;margin:0 auto">
+      <h1>Готвачи (@Model.Count)</h1>
+      <p>Верификация и управление на готвачи.</p>
+    </div>
+  </div>
+  <div class="dash-content">
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="orders-table">
+        <thead><tr><th>Готвач</th><th>Специалност</th><th>Опит</th><th>Рейтинг</th><th>Статус</th><th>Действия</th></tr></thead>
+        <tbody>
+        @foreach (var c in Model)
+        {
+          <tr>
+            <td>
+              <div style="font-weight:600">@c.User?.FullName</div>
+              <div style="font-size:.78rem;color:var(--muted)">@c.User?.Email</div>
+            </td>
+            <td>@c.Specialties</td>
+            <td>@c.ExperienceYears год.</td>
+            <td>★ @c.Rating.ToString("0.0") (@c.TotalReviews)</td>
+            <td>
+              @if (c.IsVerified)
+              { <span class="badge" style="background:var(--lime-faint);color:var(--dark)">✓ Верифициран</span> }
+              else
+              { <span class="badge" style="background:#fef3c7;color:#92400e">⏳ Чака</span> }
+            </td>
+            <td>
+              <form asp-action="VerifyChef" method="post" style="display:inline">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@c.Id">
+                <input type="hidden" name="verified" value="@(!c.IsVerified)">
+                <button type="submit" class="btn btn-sm @(c.IsVerified ? "btn-danger" : "btn-primary")">
+                  @(c.IsVerified ? "Премахни верификацията" : "✓ Верифицирай")
+                </button>
+              </form>
+            </td>
+          </tr>
+        }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

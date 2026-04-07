@@ -1,0 +1,69 @@
+@model Macrofy.ViewModels.AdminDashboardViewModel
+@{ ViewData["Title"] = "Администрация"; }
+<div class="dash-page">
+  <div class="dash-header">
+    <div style="max-width:1160px;margin:0 auto">
+      <h1>Администраторско табло</h1>
+      <p>Преглед на цялата платформа.</p>
+    </div>
+  </div>
+  <div class="dash-content">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Потребители</div><div class="stat-num">@Model.TotalUsers</div></div>
+      <div class="stat-card"><div class="stat-label">Клиенти</div><div class="stat-num">@Model.TotalClients</div></div>
+      <div class="stat-card"><div class="stat-label">Готвачи</div><div class="stat-num">@Model.TotalChefs</div></div>
+      <div class="stat-card"><div class="stat-label">Приходи</div><div class="stat-num">@Model.TotalRevenue.ToString("F0") лв</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px">
+      @if (Model.PendingChefApplications > 0)
+      {
+        <div class="card" style="background:#fef3c7;border-color:#fcd34d;display:flex;justify-content:space-between;align-items:center;gap:10px">
+          <div><strong style="color:#92400e;font-size:.9rem">@Model.PendingChefApplications готвача</strong><br><span style="font-size:.8rem;color:#78350f">чакат верификация</span></div>
+          <a asp-action="Chefs" class="btn btn-sm" style="background:#f59e0b;color:#fff;white-space:nowrap">Прегледай</a>
+        </div>
+      }
+      @if (Model.PendingOrders > 0)
+      {
+        <div class="card" style="background:var(--lime-faint);border-color:rgba(122,184,48,.4);display:flex;justify-content:space-between;align-items:center;gap:10px">
+          <div><strong style="color:var(--dark);font-size:.9rem">@Model.PendingOrders поръчки</strong><br><span style="font-size:.8rem;color:var(--muted)">изчакват потвърждение</span></div>
+          <a asp-action="Orders" class="btn btn-primary btn-sm" style="white-space:nowrap">Виж</a>
+        </div>
+      }
+      @if (Model.PendingPartnerApplications > 0)
+      {
+        <div class="card" style="background:#dbeafe;border-color:#93c5fd;display:flex;justify-content:space-between;align-items:center;gap:10px">
+          <div><strong style="color:#1e40af;font-size:.9rem">@Model.PendingPartnerApplications партньора</strong><br><span style="font-size:.8rem;color:#1d4ed8">чакат преглед</span></div>
+          <a asp-action="Partners" class="btn btn-sm" style="background:#3b82f6;color:#fff;white-space:nowrap">Прегледай</a>
+        </div>
+      }
+    </div>
+
+    <div class="card">
+      <div class="sec-hdr">
+        <h2>Последни поръчки</h2>
+        <a asp-action="Orders" class="btn btn-ghost btn-sm">Всички</a>
+      </div>
+      @if (Model.RecentOrders.Any())
+      {
+        <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>ID</th><th>Клиент</th><th>Готвач</th><th>Статус</th><th>Цена</th><th>Дата</th></tr></thead>
+          <tbody>
+          @foreach (var o in Model.RecentOrders)
+          {
+            <tr>
+              <td>#@o.Id</td><td>@o.ClientName</td><td>@o.ChefName</td>
+              <td><span class="badge badge-@o.Status">@o.Status</span></td>
+              <td>@o.TotalPrice.ToString("F0") лв</td>
+              <td style="font-size:.8rem;color:var(--muted)">@o.CreatedAt.ToString("dd.MM.yy")</td>
+            </tr>
+          }
+          </tbody>
+        </table>
+        </div>
+      }
+      else { <div class="empty-state" style="padding:32px"><h3>Все още няма поръчки.</h3></div> }
+    </div>
+  </div>
+</div>

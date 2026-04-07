@@ -1,0 +1,130 @@
+@model Macrofy.ViewModels.ClientDashboardViewModel
+@{ ViewData["Title"] = "Моето табло"; }
+<div class="dash-page">
+  <div class="dash-header">
+    <div style="max-width:1160px;margin:0 auto">
+      <h1>Добре дошъл, @Model.FullName</h1>
+      <p>@(Model.HasMacroProfile ? "Твоите макроси са настроени. Намери готвач и започни." : "Настрой макро профила си, за да намерим подходящ готвач.")</p>
+    </div>
+  </div>
+  <div class="dash-content">
+
+    @if (!Model.HasMacroProfile)
+    {
+      <div class="card" style="background:var(--lime-faint);border-color:rgba(122,184,48,.4);margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap">
+        <div>
+          <h3 style="color:var(--dark);margin-bottom:5px">Настрой своя макро профил</h3>
+          <p style="color:var(--muted);font-size:.88rem">Въведи данните си и ще изчислим точните ти дневни макронутриенти.</p>
+        </div>
+        <a asp-controller="Dashboard" asp-action="MacroProfile" class="btn btn-primary" style="white-space:nowrap">Настрой сега</a>
+      </div>
+    }
+
+    @if (Model.HasMacroProfile)
+    {
+      <div class="dash-grid">
+        <div class="macro-widget">
+          <h4>Твоите дневни макроси</h4>
+          <div class="mb-bars">
+            <div class="mb-item"><div class="mb-labels"><span>Протеин</span><span>@Model.Protein г</span></div><div class="mb-track"><div class="mb-fill protein" style="width:80%"></div></div></div>
+            <div class="mb-item"><div class="mb-labels"><span>Въглехидрати</span><span>@Model.Carbs г</span></div><div class="mb-track"><div class="mb-fill carbs" style="width:60%"></div></div></div>
+            <div class="mb-item"><div class="mb-labels"><span>Мазнини</span><span>@Model.Fat г</span></div><div class="mb-track"><div class="mb-fill fat" style="width:50%"></div></div></div>
+          </div>
+          <div class="macro-totals">
+            <div class="mt-item"><span class="mt-val">@Model.Calories</span><span class="mt-lbl">Калории</span></div>
+            <div class="mt-item"><span class="mt-val">@Model.Protein г</span><span class="mt-lbl">Протеин</span></div>
+            <div class="mt-item"><span class="mt-val">@Model.Carbs г</span><span class="mt-lbl">Въгл.</span></div>
+            <div class="mt-item"><span class="mt-val">@Model.Fat г</span><span class="mt-lbl">Мазнини</span></div>
+          </div>
+        </div>
+        @if (Model.AssignedChef != null)
+        {
+          <div class="card card-lift">
+            <div style="font-size:.7rem;font-weight:700;color:var(--lime);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px">Твоят готвач</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+              <div style="width:50px;height:50px;background:linear-gradient(135deg,var(--lime),var(--mid));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:1.2rem;color:#fff;flex-shrink:0">@Model.AssignedChef.FullName[0]</div>
+              <div><h3 style="color:var(--dark);font-size:.95rem">@Model.AssignedChef.FullName</h3><div style="font-size:.8rem;color:var(--muted)">@Model.AssignedChef.Specialties</div><div style="color:#f59e0b;font-size:.82rem;margin-top:2px">★ @Model.AssignedChef.Rating.ToString("0.0")</div></div>
+            </div>
+            <a asp-controller="Dashboard" asp-action="Chefs" class="btn btn-secondary btn-sm">Смени готвач</a>
+          </div>
+        }
+        else
+        {
+          <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;border-style:dashed;min-height:180px">
+            <h3 style="color:var(--dark)">Нямаш назначен готвач</h3>
+            <p style="color:var(--muted);font-size:.86rem;max-width:220px">Разгледай нашите готвачи и направи първата си поръчка.</p>
+            <a asp-controller="Dashboard" asp-action="Chefs" class="btn btn-primary btn-sm">Намери готвач</a>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="card" style="margin-bottom:22px">
+      <div class="sec-hdr">
+        <h2>Последни поръчки</h2>
+        <a asp-controller="Dashboard" asp-action="Orders" class="btn btn-ghost btn-sm">Всички</a>
+      </div>
+      @if (Model.RecentOrders.Any())
+      {
+        <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>ID</th><th>Готвач</th><th>Период</th><th>Статус</th><th>Цена</th><th></th></tr></thead>
+          <tbody>
+          @foreach (var o in Model.RecentOrders)
+          {
+            <tr>
+              <td><strong>#@o.Id</strong></td>
+              <td>@o.ChefName</td>
+              <td style="white-space:nowrap">@o.StartDate.ToString("dd.MM") – @o.EndDate.ToString("dd.MM")</td>
+              <td><span class="badge badge-@o.Status">@(o.Status switch { Macrofy.Models.Enum.OrderStatus.Pending=>"Изчаква", Macrofy.Models.Enum.OrderStatus.Confirmed=>"Потвърдена", Macrofy.Models.Enum.OrderStatus.Preparing=>"Приготвя се", Macrofy.Models.Enum.OrderStatus.Delivered=>"Доставена", Macrofy.Models.Enum.OrderStatus.Cancelled=>"Отменена", _=>o.Status.ToString() })</span></td>
+              <td><strong>@o.TotalPrice.ToString("F0") лв</strong></td>
+              <td><a asp-controller="Order" asp-action="Details" asp-route-id="@o.Id" class="btn btn-ghost btn-sm">Детайли</a></td>
+            </tr>
+          }
+          </tbody>
+        </table>
+        </div>
+      }
+      else
+      {
+        <div class="empty-state" style="padding:36px 20px">
+          <h3>Все още нямаш поръчки</h3>
+          <p>Намери готвач и направи първата си поръчка!</p>
+          <a asp-controller="Dashboard" asp-action="Chefs" class="btn btn-primary btn-sm">Намери готвач</a>
+        </div>
+      }
+    </div>
+
+    @if (Model.AvailableChefs.Any())
+    {
+      <div class="sec-hdr" style="margin-top:32px">
+        <h2>Налични готвачи</h2>
+        <a asp-controller="Dashboard" asp-action="Chefs" class="btn btn-ghost btn-sm">Всички</a>
+      </div>
+      <div class="chef-grid">
+      @foreach (var c in Model.AvailableChefs.Take(3))
+      {
+        <div class="chef-card">
+          <div class="chef-card-head">
+            <div class="chef-initials">@c.FullName[0]</div>
+            <h3>@c.FullName</h3>
+            <div class="chef-spec">@c.Specialties</div>
+          </div>
+          <div class="chef-card-body">
+            <p class="chef-bio">@c.Bio</p>
+            <div class="chef-meta">
+              <div class="chef-rating"><span class="star">★</span> @c.Rating.ToString("0.0") (@c.TotalReviews)</div>
+              <div class="chef-rate">@c.HourlyRate лв/ч</div>
+            </div>
+            <div class="@("chef-avail" + (c.IsAvailable ? "" : " unavail"))">@(c.IsAvailable ? "Наличен" : "Зает")</div>
+            @if (c.IsAvailable)
+            { <a asp-controller="Order" asp-action="Create" asp-route-chefId="@c.Id" class="btn btn-primary btn-sm btn-full">Поръчай</a> }
+            else
+            { <button class="btn btn-secondary btn-sm btn-full" disabled>Зает в момента</button> }
+          </div>
+        </div>
+      }
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,109 @@
+@model Macrofy.ViewModels.PartnerApplicationViewModel
+@{ ViewData["Title"] = "Партньорство"; }
+
+<div style="padding-top:66px">
+  <div style="background:linear-gradient(135deg,var(--dark),var(--mid));padding:80px 5%;color:#fff;text-align:center">
+    <div class="section-tag" style="background:rgba(122,184,48,.2);color:var(--lime-light)">ПАРТНЬОРИ</div>
+    <h1 style="font-family:'Instrument Serif',serif;font-size:clamp(2rem,4vw,3rem);margin-bottom:16px">Станете Macrofy партньор</h1>
+    <p style="opacity:.75;max-width:560px;margin:0 auto">Търсим кулинарни академии и организации, желаещи да осигурят нови кариерни възможности за своите таланти.</p>
+  </div>
+
+  <div style="max-width:1100px;margin:0 auto;padding:64px 5%;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start">
+    <div>
+      <h2 style="font-family:'Instrument Serif',serif;font-size:1.9rem;color:var(--dark);margin-bottom:32px">Какво получавате</h2>
+      <div class="benefits">
+        <div class="benefit">
+          <div class="bcheck">🚀</div>
+          <div class="btext">
+            <strong>Осигурете успех на талантите</strong>
+            <p>Предложете на завършилите платформа за професионално израстване и директен достъп до клиенти.</p>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="bcheck">🌐</div>
+          <div class="btext">
+            <strong>Разширете влиянието си</strong>
+            <p>Бъдете част от иновативна екосистема, трансформираща пазара на персонализирано хранене в България.</p>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="bcheck">💡</div>
+          <div class="btext">
+            <strong>Подкрепете младежкото предприемачество</strong>
+            <p>Допринесете за развитието на иновативен Teenovator проект и кулинарната иновация.</p>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="bcheck">🤝</div>
+          <div class="btext">
+            <strong>Дългосрочно партньорство</strong>
+            <p>Изградете устойчива връзка между академията и реалния пазар на персонализирано хранене.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:36px;box-shadow:var(--shadow-md)">
+      @if (TempData["Success"] != null)
+      {
+        <div style="text-align:center;padding:20px">
+          <div style="font-size:3rem;margin-bottom:12px">🎉</div>
+          <h3 style="color:var(--dark);margin-bottom:8px">Благодарим!</h3>
+          <p style="color:var(--muted)">Получихме вашето запитване. Ще се свържем с вас скоро.</p>
+        </div>
+      }
+      else
+      {
+        <h3 style="color:var(--dark);margin-bottom:24px">Изпратете запитване</h3>
+        <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+        <form asp-action="Apply" method="post">
+          @Html.AntiForgeryToken()
+          <div class="form-group">
+            <label asp-for="OrganizationName">Организация</label>
+            <input asp-for="OrganizationName" placeholder="Кулинарна академия XYZ">
+            <span asp-validation-for="OrganizationName" class="field-validation-error"></span>
+          </div>
+          <div class="form-group">
+            <label asp-for="OrganizationType">Тип организация</label>
+            <select asp-for="OrganizationType">
+              <option value="CulinaryAcademy">Кулинарна академия</option>
+              <option value="Restaurant">Ресторант / заведение</option>
+              <option value="FoodCompany">Хранителна компания</option>
+              <option value="FitnessCenter">Фитнес / уелнес център</option>
+              <option value="Other">Друго</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label asp-for="ContactName">Контактно лице</label>
+              <input asp-for="ContactName" placeholder="Иван Иванов">
+              <span asp-validation-for="ContactName" class="field-validation-error"></span>
+            </div>
+            <div class="form-group">
+              <label asp-for="Phone">Телефон</label>
+              <input asp-for="Phone" placeholder="+359 88...">
+            </div>
+          </div>
+          <div class="form-group">
+            <label asp-for="Email">Имейл</label>
+            <input asp-for="Email" type="email" placeholder="contact@academy.bg">
+            <span asp-validation-for="Email" class="field-validation-error"></span>
+          </div>
+          <div class="form-group">
+            <label asp-for="Message">Съобщение</label>
+            <textarea asp-for="Message" rows="4" placeholder="Разкажете ни за вашата организация и как виждате сътрудничеството..."></textarea>
+          </div>
+          <button type="submit" class="form-submit">Изпратете запитване →</button>
+        </form>
+      }
+    </div>
+  </div>
+</div>
+
+<footer style="background:#0f0f0f;color:rgba(255,255,255,.4);padding:32px 5%;font-size:.8rem">
+  <div class="foot-inner">
+    <img src="~/images/logo.png" alt="Macrofy">
+    <span>© 2025 Macrofy – Проект на Teenovator</span>
+    <a asp-controller="Home" asp-action="Index">Начало</a>
+  </div>
+</footer>

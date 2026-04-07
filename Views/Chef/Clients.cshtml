@@ -1,0 +1,58 @@
+@{ ViewData["Title"] = "Моите клиенти"; }
+
+<div class="dash-page">
+  <div class="dash-header">
+    <div style="max-width:1200px;margin:0 auto">
+      <h1>Моите клиенти</h1>
+      <p>Всички клиенти, с които си работил досега.</p>
+    </div>
+  </div>
+
+  <div class="dash-content">
+    @{
+      var clients = ViewBag.Clients as IEnumerable<dynamic>;
+    }
+    @if (clients != null && clients.Any())
+    {
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Клиент</th>
+              <th>Брой поръчки</th>
+              <th>Последна поръчка</th>
+              <th>Общо платено</th>
+            </tr>
+          </thead>
+          <tbody>
+          @foreach (var c in clients)
+          {
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:34px;height:34px;background:var(--lime-faint);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:var(--dark)">@(((string)c.Client.FullName).Substring(0,1))</div>
+                  <div>
+                    <div style="font-weight:600">@c.Client.FullName</div>
+                    <div style="font-size:.78rem;color:var(--muted)">@c.Client.Email</div>
+                  </div>
+                </div>
+              </td>
+              <td>@c.OrderCount поръчки</td>
+              <td style="color:var(--muted);font-size:.85rem">@((DateTime)c.LastOrder).ToString("dd.MM.yyyy")</td>
+              <td><strong>@((decimal)c.TotalSpent).ToString("F0") лв</strong></td>
+            </tr>
+          }
+          </tbody>
+        </table>
+      </div>
+    }
+    else
+    {
+      <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <h3>Все още нямаш клиенти</h3>
+        <p>Когато клиенти направят поръчки при теб, ще се появят тук.</p>
+      </div>
+    }
+  </div>
+</div>

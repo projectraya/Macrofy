@@ -1,0 +1,87 @@
+@model Macrofy.ViewModels.EditChefProfileViewModel
+@{ ViewData["Title"] = "Редактиране на профила"; }
+
+<div class="dash-page">
+  <div class="dash-header">
+    <div style="max-width:1200px;margin:0 auto">
+      <h1>Моят профил</h1>
+      <p>Попълни информацията за себе си — клиентите ще я виждат.</p>
+    </div>
+  </div>
+
+  <div class="dash-content">
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start">
+      <div class="card">
+        <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+        <form asp-action="EditProfile" method="post">
+          @Html.AntiForgeryToken()
+          <div class="form-group">
+            <label asp-for="Bio">Биография</label>
+            <textarea asp-for="Bio" rows="5" placeholder="Разкажи за себе си, опита си и подхода ти към храненето..."></textarea>
+            <span asp-validation-for="Bio" class="field-validation-error"></span>
+          </div>
+          <div class="form-group">
+            <label asp-for="Specialties">Специалности</label>
+            <input asp-for="Specialties" placeholder="Спортно хранене, Кето, Набиране на мускулна маса...">
+            <span asp-validation-for="Specialties" class="field-validation-error"></span>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label asp-for="ExperienceYears">Години опит</label>
+              <input asp-for="ExperienceYears" type="number" min="0" max="50">
+              <span asp-validation-for="ExperienceYears" class="field-validation-error"></span>
+            </div>
+            <div class="form-group">
+              <label asp-for="HourlyRate">Цена на час (лв)</label>
+              <input asp-for="HourlyRate" type="number" step="0.01" min="0">
+              <span asp-validation-for="HourlyRate" class="field-validation-error"></span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label asp-for="Location">Местоположение</label>
+              <input asp-for="Location" placeholder="София, Пловдив...">
+            </div>
+            <div class="form-group">
+              <label asp-for="Specialty">Основна специализация</label>
+              <select asp-for="Specialty">
+                <option value="General">Обща здравословна кухня</option>
+                <option value="SportNutrition">Спортно хранене</option>
+                <option value="Keto">Кето / Нисковъглехидратна</option>
+                <option value="Vegan">Вегетарианска / Веганска</option>
+                <option value="Mediterranean">Средиземноморска</option>
+                <option value="WeightLoss">Отслабване</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label asp-for="Certifications">Сертификати / Образование</label>
+            <input asp-for="Certifications" placeholder="НСА Сертификат, Курс по диетология...">
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;gap:10px">
+            <input asp-for="IsAvailable" type="checkbox" style="width:auto;margin:0">
+            <label asp-for="IsAvailable" style="text-transform:none;font-size:.9rem;letter-spacing:0;margin:0;cursor:pointer">Наличен за нови клиенти</label>
+          </div>
+          <button type="submit" class="form-submit">Запази промените →</button>
+        </form>
+      </div>
+
+      <div style="position:sticky;top:90px;display:flex;flex-direction:column;gap:16px">
+        <div class="card" style="text-align:center">
+          <div style="width:80px;height:80px;background:linear-gradient(135deg,var(--lime),var(--mid));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 14px">👨‍🍳</div>
+          <h3 style="color:var(--dark);margin-bottom:4px">Профилна снимка</h3>
+          <p style="font-size:.82rem;color:var(--muted)">Снимката се добавя скоро</p>
+        </div>
+        <div class="card" style="background:var(--lime-faint);border-color:var(--lime)">
+          <h4 style="color:var(--dark);margin-bottom:10px">💡 Съвети за профила</h4>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px">
+            <li style="font-size:.82rem;color:var(--muted);display:flex;gap:6px"><span style="color:var(--lime)">✓</span>Попълни пълна биография</li>
+            <li style="font-size:.82rem;color:var(--muted);display:flex;gap:6px"><span style="color:var(--lime)">✓</span>Добави сертификати</li>
+            <li style="font-size:.82rem;color:var(--muted);display:flex;gap:6px"><span style="color:var(--lime)">✓</span>Задай реална цена</li>
+            <li style="font-size:.82rem;color:var(--muted);display:flex;gap:6px"><span style="color:var(--lime)">✓</span>Избери специализация</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

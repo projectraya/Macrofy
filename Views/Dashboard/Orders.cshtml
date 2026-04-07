@@ -1,0 +1,56 @@
+@model List<Macrofy.ViewModels.OrderViewModel>
+@{ ViewData["Title"] = "Моите поръчки"; }
+<div class="dash-page">
+  <div class="dash-header">
+    <div style="max-width:1160px;margin:0 auto">
+      <h1>Моите поръчки</h1>
+      <p>Преглед на всички твои поръчки и техния статус.</p>
+    </div>
+  </div>
+  <div class="dash-content">
+    @if (Model.Any())
+    {
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>ID</th><th>Готвач</th><th>Начало</th><th>Край</th><th>Статус</th><th>Цена</th><th></th></tr></thead>
+          <tbody>
+          @foreach (var o in Model)
+          {
+            <tr>
+              <td><strong>#@o.Id</strong></td>
+              <td>@o.ChefName</td>
+              <td>@o.StartDate.ToString("dd.MM.yyyy")</td>
+              <td>@o.EndDate.ToString("dd.MM.yyyy")</td>
+              <td><span class="badge badge-@o.Status">@(o.Status switch { Macrofy.Models.Enum.OrderStatus.Pending=>"Изчаква", Macrofy.Models.Enum.OrderStatus.Confirmed=>"Потвърдена", Macrofy.Models.Enum.OrderStatus.Preparing=>"Приготвя се", Macrofy.Models.Enum.OrderStatus.Delivered=>"Доставена", Macrofy.Models.Enum.OrderStatus.Cancelled=>"Отменена", _=>o.Status.ToString() })</span></td>
+              <td><strong>@o.TotalPrice.ToString("F0") лв</strong></td>
+              <td>
+                <div style="display:flex;gap:6px">
+                  <a asp-controller="Order" asp-action="Details" asp-route-id="@o.Id" class="btn btn-ghost btn-sm">Детайли</a>
+                  @if (o.Status == Macrofy.Models.Enum.OrderStatus.Pending)
+                  {
+                    <form asp-controller="Order" asp-action="Cancel" method="post" style="display:inline" onsubmit="return confirm('Сигурен ли си, че искаш да отмениш поръчката?')">
+                      @Html.AntiForgeryToken()
+                      <input type="hidden" name="id" value="@o.Id">
+                      <button type="submit" class="btn btn-danger btn-sm">Отмени</button>
+                    </form>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+          </tbody>
+        </table>
+        </div>
+      </div>
+    }
+    else
+    {
+      <div class="empty-state">
+        <h3>Все още нямаш поръчки</h3>
+        <p>Намери готвач и направи първата си поръчка!</p>
+        <a asp-controller="Dashboard" asp-action="Chefs" class="btn btn-primary btn-sm">Намери готвач</a>
+      </div>
+    }
+  </div>
+</div>

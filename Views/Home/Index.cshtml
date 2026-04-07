@@ -1,0 +1,258 @@
+@{
+    ViewData["Title"] = "Храна, приготвена точно по твоите макроси";
+    var chefs = ViewBag.FeaturedChefs as List<Macrofy.ViewModels.ChefCardViewModel> ?? new();
+}
+<div class="pub-page">
+
+<!-- HERO -->
+<div style="background:var(--cream)">
+<div class="hero">
+  <div>
+    <div class="hero-badge"><span class="hero-dot"></span>Приемаме нови клиенти в София</div>
+    <h1>Храна, приготвена<br>точно по твоите<br><span class="ul">макроси.</span></h1>
+    <p class="hero-desc">Знаеш целите си. Проблемът не е знанието — проблемът е изпълнението всеки ден. Macrofy свързва теб с готвач, който приготвя менюто и го доставя при теб.</p>
+    <div class="hero-btns">
+      <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg">Намери своя готвач</a>
+      <a href="#how" class="btn btn-ghost">Виж как работи</a>
+    </div>
+    <div class="hero-trust">
+      <span class="trust-item"><span class="trust-icon"></span>Проект на Teenovator</span>
+      <span class="trust-item"><span class="trust-icon"></span>Проверени готвачи</span>
+      <span class="trust-item"><span class="trust-icon"></span>Пресни продукти</span>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-img-box">
+      <div class="hero-img-inner"><p>Персонализирано меню<br>точно за твоите макроси</p></div>
+    </div>
+    <div class="hero-pill">
+      <strong>2 100 ккал / ден</strong>
+      <span>Точно по твоите цели</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PROBLEM -->
+<section class="pub-sec sec-center reveal" id="problem">
+  <div class="section-tag">Проблемът</div>
+  <h2 class="sec-title">Познато ли ти е това?</h2>
+  <p class="sec-desc">Повечето хора знаят какво трябва да ядат. Малцина успяват да го правят последователно.</p>
+  <div class="prob-grid">
+    <div class="prob-card">
+      <div class="prob-icon">
+        <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="12" y2="15"/></svg>
+      </div>
+      <h3>Имаш приложение с макросите.</h3>
+      <p>Знаеш цифрите. Знаеш целите. Но в края на деня — поръчваш нещо бързо.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <h3>Нямаш време да готвиш по цифри.</h3>
+      <p>Пазаруването, планирането, готвенето — всичко отнема повече, отколкото имаш.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-icon">
+        <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+      </div>
+      <h3>Резултатите идват бавно.</h3>
+      <p>Не защото планът е лош. А защото изпълнението е непоследователно.</p>
+    </div>
+  </div>
+  <div class="prob-quote">
+    <p>Не е въпрос на мотивация.<br>Всеки може да знае какво трябва да яде.<br>Малко хора имат <strong>система</strong>, която го прави да се случи.</p>
+    <div class="q-main"><strong>Macrofy</strong> е тази система.</div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section style="background:#fff;padding:88px 0" id="how">
+<div class="pub-sec reveal" style="padding-top:0;padding-bottom:0">
+  <div class="how-grid">
+    <div>
+      <div class="section-tag">Процесът</div>
+      <h2 class="sec-title">Как работи Macrofy</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-box"><span class="s-num">01</span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+          <div class="step-body"><h3>Въведи своите цели</h3><p>Споделяш дневните си макронутриенти — протеин, въглехидрати, мазнини, калории — и диетичните си предпочитания.</p></div>
+        </div>
+        <div class="step">
+          <div class="step-box"><span class="s-num">02</span><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="step-body"><h3>Получаваш подходящ готвач</h3><p>Свързваме те с готвач от нашата мрежа. Той изготвя седмично меню точно за теб и го съгласува с теб.</p></div>
+        </div>
+        <div class="step">
+          <div class="step-box"><span class="s-num">03</span><svg viewBox="0 0 24 24"><path d="M5 12H19"/><path d="M12 5l7 7-7 7"/></svg></div>
+          <div class="step-body"><h3>Прясна храна до теб</h3><p>Готвачът приготвя и доставя. Без замразено. Без шаблони. Само храна, която работи за твоите цели.</p></div>
+        </div>
+      </div>
+      <a asp-controller="Account" asp-action="Register" class="btn btn-primary" style="margin-top:28px">Започни сега</a>
+    </div>
+    <div class="macro-widget">
+      <h4>Твоите макроси за деня</h4>
+      <div class="mb-bars">
+        <div class="mb-item"><div class="mb-labels"><span>Протеин</span><span>156 г / 160 г</span></div><div class="mb-track"><div class="mb-fill protein" style="width:78%"></div></div></div>
+        <div class="mb-item"><div class="mb-labels"><span>Въглехидрати</span><span>180 г / 200 г</span></div><div class="mb-track"><div class="mb-fill carbs" style="width:45%"></div></div></div>
+        <div class="mb-item"><div class="mb-labels"><span>Мазнини</span><span>55 г / 65 г</span></div><div class="mb-track"><div class="mb-fill fat" style="width:30%"></div></div></div>
+      </div>
+      <div class="macro-totals">
+        <div class="mt-item"><span class="mt-val">2 100</span><span class="mt-lbl">Калории</span></div>
+        <div class="mt-item"><span class="mt-val">160 г</span><span class="mt-lbl">Протеин</span></div>
+        <div class="mt-item"><span class="mt-val">200 г</span><span class="mt-lbl">Въглехидрати</span></div>
+        <div class="mt-item"><span class="mt-val">65 г</span><span class="mt-lbl">Мазнини</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- FOR CLIENTS -->
+<section class="pub-full dark-sec reveal">
+<div class="pub-sec" style="padding-top:0;padding-bottom:0">
+  <div class="section-tag" style="background:rgba(122,184,48,.2);color:var(--lime-light)">За клиенти</div>
+  <h2 class="sec-title">Не още едно приложение.<br><em>Истинска храна</em> с истински резултати.</h2>
+  <p class="sec-desc">Macrofy не е Glovo с "по-здравословно меню." И не е шаблонен план за 1200 калории. Това е директна връзка с готвач, който прави храна специално за теб.</p>
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+      <h3>Точни макроси</h3>
+      <p>Всяко ястие е съобразено с твоите цифри. Не приблизително. Точно.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <h3>Истински готвач</h3>
+      <p>Не фабрична кухня. Истински човек, подбиран за теб.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+      <h3>Пресни продукти</h3>
+      <p>Без замразено, без консерванти. Приготвено в деня на доставката.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+      <h3>До теб</h3>
+      <p>Доставка до адрес в удобно за теб време.</p>
+    </div>
+  </div>
+  <a asp-controller="Account" asp-action="Register" class="btn btn-white-outline">Регистрирай се безплатно</a>
+</div>
+</section>
+
+<!-- FEATURED CHEFS -->
+@if (chefs.Any())
+{
+<section class="pub-sec reveal">
+  <div class="section-tag">Нашите готвачи</div>
+  <h2 class="sec-title">Запознай се с готвачите</h2>
+  <p class="sec-desc">Всеки готвач е внимателно подбран и верифициран от нашия екип.</p>
+  <div class="chef-grid">
+  @foreach (var c in chefs)
+  {
+    <div class="chef-card">
+      <div class="chef-card-head">
+        <div class="chef-initials">@(c.FullName.Length > 0 ? c.FullName[0].ToString() : "?")</div>
+        <h3>@c.FullName</h3>
+        <div class="chef-spec">@c.Specialties</div>
+      </div>
+      <div class="chef-card-body">
+        <p class="chef-bio">@c.Bio</p>
+        <div class="chef-meta">
+          <div class="chef-rating"><span class="star">★</span> @c.Rating.ToString("0.0") (@c.TotalReviews оценки)</div>
+          <div class="chef-rate">@c.HourlyRate лв/ч</div>
+        </div>
+        <div class="@("chef-avail" + (c.IsAvailable ? "" : " unavail"))">@(c.IsAvailable ? "Наличен" : "Зает")</div>
+        <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-sm btn-full">Работи с @c.FullName.Split(' ')[0]</a>
+      </div>
+    </div>
+  }
+  </div>
+</section>
+}
+
+<!-- FOR CHEFS -->
+<section style="background:#fff;padding:88px 5%">
+<div style="max-width:1160px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center" class="reveal">
+  <div>
+    <div class="section-tag">За готвачи</div>
+    <h2 class="sec-title">Готвиш добре.<br>Намери клиенти, за<br>които това има стойност.</h2>
+    <p class="sec-desc">Ресторантите плащат зле. Намирането на частни клиенти е случайно. Macrofy дава структура — платформа, свързваща уменията ти с хора, имащи нужда от редовна, качествена, персонализирана услуга.</p>
+    <div class="benefits">
+      <div class="benefit"><div class="b-check"><svg viewBox="0 0 10 7"><polyline points="1 3.5 3.5 6 9 1"/></svg></div><div class="b-text"><strong>Повтарящи се клиенти</strong><p>Хора с фитнес цели поръчват всяка седмица, не еднократно</p></div></div>
+      <div class="benefit"><div class="b-check"><svg viewBox="0 0 10 7"><polyline points="1 3.5 3.5 6 9 1"/></svg></div><div class="b-text"><strong>Ти определяш капацитета</strong><p>Работиш с толкова клиенти, колкото искаш</p></div></div>
+      <div class="benefit"><div class="b-check"><svg viewBox="0 0 10 7"><polyline points="1 3.5 3.5 6 9 1"/></svg></div><div class="b-text"><strong>Изграждаш репутация</strong><p>Реален профил, оценки, портфолио</p></div></div>
+    </div>
+    <a asp-controller="Account" asp-action="Register" asp-route-role="chef" class="btn btn-primary">Кандидатствай като готвач</a>
+  </div>
+  <div class="card" style="padding:32px;box-shadow:var(--shadow-md)">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="width:72px;height:72px;background:linear-gradient(135deg,var(--lime),var(--mid));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <h3 style="color:var(--dark)">Иван Петров</h3>
+      <div style="color:#f59e0b;font-size:.88rem;margin:3px 0">★★★★★</div>
+      <span style="font-size:.8rem;color:var(--muted)">Спортно хранене</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <div style="text-align:center;background:var(--cream);border-radius:var(--rs);padding:13px"><strong style="font-family:'Instrument Serif',serif;font-size:1.35rem;color:var(--dark);display:block">12</strong><span style="font-size:.72rem;color:var(--muted)">Клиенти</span></div>
+      <div style="text-align:center;background:var(--cream);border-radius:var(--rs);padding:13px"><strong style="font-family:'Instrument Serif',serif;font-size:1.35rem;color:var(--dark);display:block">4.9</strong><span style="font-size:.72rem;color:var(--muted)">Рейтинг</span></div>
+      <div style="text-align:center;background:var(--cream);border-radius:var(--rs);padding:13px"><strong style="font-family:'Instrument Serif',serif;font-size:1.35rem;color:var(--dark);display:block">98%</strong><span style="font-size:.72rem;color:var(--muted)">Повтарящи</span></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- PARTNERS -->
+<section class="pub-sec reveal">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start">
+    <div>
+      <div class="section-tag">Партньори</div>
+      <h2 class="sec-title">Станете Macrofy партньор</h2>
+      <p class="sec-desc">Търсим стратегически партньори — кулинарни академии и организации — желаещи да осигурят нови кариерни възможности за своите таланти.</p>
+      <div class="benefits">
+        <div class="benefit"><div class="b-check"><svg viewBox="0 0 10 7"><polyline points="1 3.5 3.5 6 9 1"/></svg></div><div class="b-text"><strong>Осигурете успех на талантите</strong><p>Платформа за професионално израстване и директен достъп до клиенти</p></div></div>
+        <div class="benefit"><div class="b-check"><svg viewBox="0 0 10 7"><polyline points="1 3.5 3.5 6 9 1"/></svg></div><div class="b-text"><strong>Разширете влиянието си</strong><p>Иновативна екосистема, трансформираща пазара на персонализирано хранене</p></div></div>
+        <div class="benefit"><div class="b-check"><svg viewBox="0 0 10 7"><polyline points="1 3.5 3.5 6 9 1"/></svg></div><div class="b-text"><strong>Подкрепете младежкото предприемачество</strong><p>Иновативен Teenovator проект и кулинарна иновация</p></div></div>
+      </div>
+      <a asp-controller="Partner" asp-action="Apply" class="btn btn-primary">Свържете се с нас</a>
+    </div>
+    <div class="card" style="padding:28px">
+      <h3 style="color:var(--dark);margin-bottom:20px;font-size:1.05rem;font-weight:700">Изпратете запитване</h3>
+      <form asp-controller="Partner" asp-action="Apply" method="post">
+        @Html.AntiForgeryToken()
+        <div class="fg"><label>Организация</label><input type="text" name="OrganizationName" placeholder="Кулинарна академия XYZ" required></div>
+        <div class="fg"><label>Имейл</label><input type="email" name="Email" placeholder="contact@academy.bg" required></div>
+        <input type="hidden" name="ContactName" value="Запитване от началната страница">
+        <div class="fg"><label>Съобщение</label><textarea name="Message" placeholder="Разкажете ни за вашата организация..." rows="3"></textarea></div>
+        <button type="submit" class="form-submit">Изпратете запитване</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-banner">
+  <h2 class="sec-title">Готов да започнеш?</h2>
+  <p class="cta-desc">Присъедини се към Macrofy и се погрижи за храненето си веднъж завинаги.</p>
+  <div class="cta-btns">
+    <a asp-controller="Account" asp-action="Register" class="btn btn-lime btn-lg">Намери своя готвач</a>
+    <a asp-controller="Account" asp-action="Register" asp-route-role="chef" class="btn btn-white-outline btn-lg">Кандидатствай като готвач</a>
+  </div>
+</div>
+
+<footer>
+  <div class="foot-inner">
+    <img src="~/images/logo.png" alt="Macrofy">
+    <span>© 2025 Macrofy – Проект на Teenovator</span>
+    <a href="mailto:hello@macrofy.online">hello@macrofy.online</a>
+  </div>
+</footer>
+</div>
+
+@section Scripts {
+<script>
+const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+}

@@ -1,0 +1,35 @@
+@model List<Macrofy.Models.ApplicationUser>
+@{ ViewData["Title"] = "Потребители"; }
+
+<div class="dash-page">
+  <div class="dash-header">
+    <div style="max-width:1200px;margin:0 auto">
+      <h1>Потребители (@Model.Count)</h1>
+    </div>
+  </div>
+  <div class="dash-content">
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="orders-table">
+        <thead><tr><th>Потребител</th><th>Роля</th><th>Макро профил</th><th>Регистриран</th></tr></thead>
+        <tbody>
+        @foreach (var u in Model)
+        {
+          <tr>
+            <td>
+              <div style="font-weight:600">@u.FullName</div>
+              <div style="font-size:.78rem;color:var(--muted)">@u.Email</div>
+            </td>
+            <td>
+              <span class="badge @(u.Role == Macrofy.Models.UserRole.Admin ? "badge-Confirmed" : u.Role == Macrofy.Models.UserRole.Chef ? "badge-Preparing" : "badge-Delivered")">
+                @(u.Role == Macrofy.Models.UserRole.Admin ? "🔧 Admin" : u.Role == Macrofy.Models.UserRole.Chef ? "👨‍🍳 Готвач" : "👤 Клиент")
+              </span>
+            </td>
+            <td>@(u.DailyCalories.HasValue ? $"✓ {u.DailyCalories} ккал" : "–")</td>
+            <td style="font-size:.82rem;color:var(--muted)">@u.CreatedAt.ToString("dd.MM.yyyy")</td>
+          </tr>
+        }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

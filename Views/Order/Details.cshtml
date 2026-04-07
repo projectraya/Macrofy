@@ -1,0 +1,121 @@
+@model Macrofy.Models.Order
+@{ ViewData["Title"] = "Поръчка #" + Model.Id; bool isClient = (bool)(ViewBag.IsClient ?? true); }
+
+<div class="dash-page">
+  <div class="dash-header">
+    <div style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <h1>Поръчка #@Model.Id</h1>
+        <p>Създадена на @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</p>
+      </div>
+      <span class="badge badge-@Model.Status" style="font-size:.9rem;padding:8px 18px">
+        @(Model.Status switch {
+          Macrofy.Models.Enum.OrderStatus.Pending => "⏳ Изчаква потвърждение",
+          Macrofy.Models.Enum.OrderStatus.Confirmed => "✓ Потвърдена",
+          Macrofy.Models.Enum.OrderStatus.Preparing => "🍳 Приготвя се",
+          Macrofy.Models.Enum.OrderStatus.Delivered => "📦 Доставена",
+          Macrofy.Models.Enum.OrderStatus.Cancelled => "✕ Отменена",
+          _ => Model.Status.ToString()
+        })
+      </span>
+    </div>
+  </div>
+
+  <div class="dash-content">
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:24px">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card">
+          <h3 style="color:var(--dark);margin-bottom:20px">Детайли</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div>
+              <div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px">@(isClient ? "Готвач" : "Клиент")</div>
+              <div style="font-weight:600">@(isClient ? Model.ChefProfile.User.FullName : Model.Client.FullName)</div>
+            </div>
+            <div>
+              <div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Адрес за доставка</div>
+              <div>@Model.DeliveryAddress</div>
+            </div>
+            <div>
+              <div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Начало</div>
+              <div>@Model.StartDate.ToString("dd.MM.yyyy")</div>
+            </div>
+            <div>
+              <div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Край</div>
+              <div>@Model.EndDate.ToString("dd.MM.yyyy")</div>
+            </div>
+            <div>
+              <div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Обща цена</div>
+              <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:var(--dark)">@Model.TotalPrice.ToString("F0") лв</div>
+            </div>
+          </div>
+          @if (!string.IsNullOrEmpty(Model.Notes))
+          {
+            <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+              <div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Бележки</div>
+              <p style="font-size:.9rem;color:var(--muted)">@Model.Notes</p>
+            </div>
+          }
+        </div>
+
+        @if (!isClient && Model.Status == Macrofy.Models.Enum.OrderStatus.Pending)
+        {
+          <div class="card" style="border-color:var(--lime)">
+            <h3 style="margin-bottom:16px">Действия</h3>
+            <div style="display:flex;gap:10px">
+              <form asp-controller="Chef" asp-action="UpdateOrderStatus" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="orderId" value="@Model.Id">
+                <input type="hidden" name="status" value="Confirmed">
+                <button type="submit" class="btn btn-primary">✓ Потвърди поръчката</button>
+              </form>
+              <form asp-controller="Chef" asp-action="UpdateOrderStatus" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="orderId" value="@Model.Id">
+                <input type="hidden" name="status" value="Cancelled">
+                <button type="submit" class="btn btn-danger">✕ Откажи</button>
+              </form>
+            </div>
+          </div>
+        }
+        @if (!isClient && Model.Status == Macrofy.Models.Enum.OrderStatus.Confirmed)
+        {
+          <div class="card">
+            <form asp-controller="Chef" asp-action="UpdateOrderStatus" method="post">
+              @Html.AntiForgeryToken()
+              <input type="hidden" name="orderId" value="@Model.Id">
+              <input type="hidden" name="status" value="Preparing">
+              <button type="submit" class="btn btn-primary">🍳 Започни приготвяне</button>
+            </form>
+          </div>
+        }
+        @if (!isClient && Model.Status == Macrofy.Models.Enum.OrderStatus.Preparing)
+        {
+          <div class="card">
+            <form asp-controller="Chef" asp-action="UpdateOrderStatus" method="post">
+              @Html.AntiForgeryToken()
+              <input type="hidden" name="orderId" value="@Model.Id">
+              <input type="hidden" name="status" value="Delivered">
+              <button type="submit" class="btn btn-lime">📦 Маркирай като доставена</button>
+            </form>
+          </div>
+        }
+      </div>
+
+      <div style="position:sticky;top:90px;display:flex;flex-direction:column;gap:16px">
+        <div class="card">
+          <div style="font-size:.72rem;font-weight:700;color:var(--lime);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">@(isClient ? "Твоят готвач" : "Клиент")</div>
+          <div style="text-align:center">
+            <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--lime),var(--mid));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 10px">@(isClient ? "👨‍🍳" : "👤")</div>
+            <h3 style="color:var(--dark)">@(isClient ? Model.ChefProfile.User.FullName : Model.Client.FullName)</h3>
+            @if (isClient)
+            {
+              <div style="color:#f59e0b;font-size:.85rem;margin-top:4px">★ @Model.ChefProfile.Rating.ToString("0.0")</div>
+              <div style="font-size:.8rem;color:var(--muted);margin-top:4px">@Model.ChefProfile.Specialties</div>
+            }
+          </div>
+        </div>
+        <a asp-controller="Dashboard" asp-action="@(isClient ? "Orders" : "Index")" class="btn btn-secondary" style="text-align:center">← Назад</a>
+      </div>
+    </div>
+  </div>
+</div>

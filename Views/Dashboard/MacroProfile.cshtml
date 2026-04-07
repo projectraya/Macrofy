@@ -1,0 +1,158 @@
+@model Macrofy.ViewModels.MacroProfileViewModel
+@{ ViewData["Title"] = "Макро профил"; }
+
+<div class="dash-page">
+  <div class="dash-header">
+    <div style="max-width:1200px;margin:0 auto">
+      <h1>Макро профил</h1>
+      <p>Въведи данните си и ще изчислим точните ти дневни нужди.</p>
+    </div>
+  </div>
+
+  <div class="dash-content">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+      <div class="card">
+        <h3 style="color:var(--dark);margin-bottom:24px">Лични данни</h3>
+        <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+        <form asp-action="MacroProfile" method="post" id="macroForm">
+          @Html.AntiForgeryToken()
+          <div class="form-row">
+            <div class="form-group">
+              <label asp-for="Age">Възраст</label>
+              <input asp-for="Age" type="number" placeholder="25" oninput="calcPreview()">
+              <span asp-validation-for="Age" class="field-validation-error"></span>
+            </div>
+            <div class="form-group">
+              <label asp-for="WeightKg">Тегло (кг)</label>
+              <input asp-for="WeightKg" type="number" step="0.1" placeholder="70" oninput="calcPreview()">
+              <span asp-validation-for="WeightKg" class="field-validation-error"></span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label asp-for="HeightCm">Ръст (см)</label>
+              <input asp-for="HeightCm" type="number" step="0.1" placeholder="175" oninput="calcPreview()">
+              <span asp-validation-for="HeightCm" class="field-validation-error"></span>
+            </div>
+            <div class="form-group">
+              <label asp-for="Gender">Пол</label>
+              <select asp-for="Gender" onchange="calcPreview()">
+                <option value="Male">Мъж</option>
+                <option value="Female">Жена</option>
+                <option value="Other">Друг</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label asp-for="ActivityLevel">Ниво на активност</label>
+            <select asp-for="ActivityLevel" onchange="calcPreview()">
+              <option value="Sedentary">Заседнал (офис работа)</option>
+              <option value="Light">Леко активен (1-2 пъти/седм.)</option>
+              <option value="Moderate">Умерено активен (3-5 пъти/седм.)</option>
+              <option value="Active">Много активен (6-7 пъти/седм.)</option>
+              <option value="VeryActive">Изключително активен</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label asp-for="Goal">Цел</label>
+            <select asp-for="Goal" onchange="calcPreview()">
+              <option value="LoseWeight">Отслабване</option>
+              <option value="Maintain">Поддържане на тегло</option>
+              <option value="GainMuscle">Набиране на мускулна маса</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label asp-for="DietaryPreference">Диетични предпочитания</label>
+            <select asp-for="DietaryPreference">
+              <option value="Standard">Стандартна диета</option>
+              <option value="Vegetarian">Вегетарианска</option>
+              <option value="Vegan">Веганска</option>
+              <option value="Keto">Кето</option>
+              <option value="GlutenFree">Без глутен</option>
+              <option value="DairyFree">Без лактоза</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label asp-for="Allergies">Алергии или специфики</label>
+            <textarea asp-for="Allergies" placeholder="Напр. алергия към ядки, без свинско месо..."></textarea>
+          </div>
+          <button type="submit" class="form-submit">Запази профила →</button>
+        </form>
+      </div>
+
+      <div>
+        <div class="macro-widget" id="macroPreview">
+          <h4>🧮 Преглед на макросите</h4>
+          <div id="previewContent" style="text-align:center;padding:20px;opacity:.6">
+            <div style="font-size:2rem;margin-bottom:8px">⚡</div>
+            <p style="font-size:.9rem">Въведи данните вляво и макросите ще се изчислят автоматично</p>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h4 style="color:var(--dark);margin-bottom:16px">ℹ️ Как се изчислява</h4>
+          <p style="font-size:.85rem;color:var(--muted);line-height:1.7">
+            Използваме формулата <strong>Mifflin-St Jeor</strong> — най-точната формула за изчисляване на базалния метаболизъм (BMR). 
+            Умножаваме по коефициент за активност и коригираме спрямо целта ти.
+          </p>
+          <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:8px;align-items:center;font-size:.82rem;color:var(--muted)"><span style="color:var(--lime);font-weight:700">●</span> Протеин: 2г на кг телесно тегло</div>
+            <div style="display:flex;gap:8px;align-items:center;font-size:.82rem;color:var(--muted)"><span style="color:#60a5fa;font-weight:700">●</span> Мазнини: 25% от калориите</div>
+            <div style="display:flex;gap:8px;align-items:center;font-size:.82rem;color:var(--muted)"><span style="color:#f59e0b;font-weight:700">●</span> Въглехидрати: останалите калории</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+<script>
+function calcPreview() {
+  const age = +document.querySelector('[name="Age"]').value;
+  const weight = +document.querySelector('[name="WeightKg"]').value;
+  const height = +document.querySelector('[name="HeightCm"]').value;
+  const gender = document.querySelector('[name="Gender"]').value;
+  const activity = document.querySelector('[name="ActivityLevel"]').value;
+  const goal = document.querySelector('[name="Goal"]').value;
+
+  if (!age || !weight || !height) return;
+
+  let bmr = gender === 'Male'
+    ? 10 * weight + 6.25 * height - 5 * age + 5
+    : 10 * weight + 6.25 * height - 5 * age - 161;
+
+  const mult = {Sedentary:1.2,Light:1.375,Moderate:1.55,Active:1.725,VeryActive:1.9};
+  let tdee = bmr * (mult[activity] || 1.55);
+  if (goal === 'LoseWeight') tdee -= 400;
+  if (goal === 'GainMuscle') tdee += 300;
+
+  const cal = Math.round(tdee);
+  const prot = Math.round(weight * 2);
+  const fat = Math.round(tdee * 0.25 / 9);
+  const carbs = Math.max(0, Math.round((tdee - prot * 4 - fat * 9) / 4));
+
+  document.getElementById('previewContent').innerHTML = `
+    <div style="margin-bottom:20px">
+      <div style="font-family:'Instrument Serif',serif;font-size:2.5rem;color:#fff">${cal}</div>
+      <div style="font-size:.8rem;opacity:.65;margin-top:2px">калории на ден</div>
+    </div>
+    <div class="macro-bars">
+      <div class="macro-bar-item">
+        <div class="macro-bar-labels"><span>Протеин</span><span>${prot}г</span></div>
+        <div class="macro-bar-track"><div class="macro-bar-fill protein" style="width:${Math.min(100,prot*100/(prot+50))}%"></div></div>
+      </div>
+      <div class="macro-bar-item">
+        <div class="macro-bar-labels"><span>Въглехидрати</span><span>${carbs}г</span></div>
+        <div class="macro-bar-track"><div class="macro-bar-fill carbs" style="width:${Math.min(100,carbs*100/(carbs+80))}%"></div></div>
+      </div>
+      <div class="macro-bar-item">
+        <div class="macro-bar-labels"><span>Мазнини</span><span>${fat}г</span></div>
+        <div class="macro-bar-track"><div class="macro-bar-fill fat" style="width:${Math.min(100,fat*100/(fat+40))}%"></div></div>
+      </div>
+    </div>`;
+}
+// Run on load if data already present
+window.addEventListener('DOMContentLoaded', calcPreview);
+</script>
+}

@@ -1,0 +1,34 @@
+@model Macrofy.ViewModels.LoginViewModel
+@{ ViewData["Title"] = "Вход"; }
+<div class="auth-page">
+  <div class="auth-left">
+    <img class="logo-white" src="~/images/logo.png" alt="Macrofy">
+    <h2>Добре дошъл обратно!</h2>
+    <p>Влез в профила си и продължи пътя към твоите хранителни цели с персонализирана грижа.</p>
+    <div class="auth-feats">
+      <div class="auth-feat"><div class="auth-check">&#10003;</div>Персонализирани макро профили</div>
+      <div class="auth-feat"><div class="auth-check">&#10003;</div>Свързване с проверени готвачи</div>
+      <div class="auth-feat"><div class="auth-check">&#10003;</div>Прясна храна до вратата ти</div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <h1>Вход</h1>
+      <p class="auth-sub">Въведи имейл и парола за достъп до профила си.</p>
+      <div asp-validation-summary="ModelOnly" class="val-summary"></div>
+      <form asp-action="Login" method="post">
+        @Html.AntiForgeryToken()
+        <div class="fg"><label asp-for="Email">Имейл</label><input asp-for="Email" type="email" placeholder="ivan@email.com" autocomplete="email"><span asp-validation-for="Email" class="fv-error"></span></div>
+        <div class="fg"><label asp-for="Password">Парола</label><input asp-for="Password" type="password" placeholder="••••••••" autocomplete="current-password"><span asp-validation-for="Password" class="fv-error"></span></div>
+        <button type="submit" class="form-submit">Влез в профила</button>
+      </form>
+      <div class="auth-foot">Нямаш профил? <a asp-action="Register">Регистрирай се безплатно</a></div>
+      <div class="demo-box">
+        <strong>Demo акаунти:</strong><br>
+        Клиент: demo@macrofy.bg / Client@123!<br>
+        Готвач: ivan@macrofy.bg / Chef@123!<br>
+        Админ: admin@macrofy.bg / Admin@123!
+      </div>
+    </div>
+  </div>
+</div>

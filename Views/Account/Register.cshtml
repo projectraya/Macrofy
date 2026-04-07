@@ -1,0 +1,39 @@
+@model Macrofy.ViewModels.RegisterViewModel
+@{ ViewData["Title"] = "Регистрация"; }
+<div class="auth-page">
+  <div class="auth-left">
+    <img class="logo-white" src="~/images/logo.png" alt="Macrofy">
+    <h2>Започни с Macrofy</h2>
+    <p>Създай профил безплатно и се свържи с готвач, който ще превърне хранителните ти цели в реалност.</p>
+    <div class="auth-feats">
+      <div class="auth-feat"><div class="auth-check">&#10003;</div>Безплатна регистрация</div>
+      <div class="auth-feat"><div class="auth-check">&#10003;</div>Макро калкулатор включен</div>
+      <div class="auth-feat"><div class="auth-check">&#10003;</div>Готвачи в София</div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <h1>Регистрация</h1>
+      <p class="auth-sub">Попълни данните и за минути ще имаш профил.</p>
+      <div asp-validation-summary="ModelOnly" class="val-summary"></div>
+      <form asp-action="Register" method="post">
+        @Html.AntiForgeryToken()
+        <div class="fg"><label asp-for="FullName">Пълно Име</label><input asp-for="FullName" placeholder="Иван Иванов"><span asp-validation-for="FullName" class="fv-error"></span></div>
+        <div class="fg"><label asp-for="Email">Имейл</label><input asp-for="Email" type="email" placeholder="ivan@email.com"><span asp-validation-for="Email" class="fv-error"></span></div>
+        <div class="form-row">
+          <div class="fg"><label asp-for="Password">Парола</label><input asp-for="Password" type="password" placeholder="••••••••"><span asp-validation-for="Password" class="fv-error"></span></div>
+          <div class="fg"><label asp-for="ConfirmPassword">Потвърди</label><input asp-for="ConfirmPassword" type="password" placeholder="••••••••"><span asp-validation-for="ConfirmPassword" class="fv-error"></span></div>
+        </div>
+        <div class="fg">
+          <label asp-for="Role">Регистрирай се като</label>
+          <select asp-for="Role">
+            <option value="Client">Клиент — търся готвач</option>
+            <option value="Chef">Готвач — предлагам услуги</option>
+          </select>
+        </div>
+        <button type="submit" class="form-submit">Създай профил</button>
+      </form>
+      <div class="auth-foot">Вече имаш профил? <a asp-action="Login">Влез тук</a></div>
+    </div>
+  </div>
+</div>
