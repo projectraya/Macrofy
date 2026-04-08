@@ -3,38 +3,50 @@ using Microsoft.EntityFrameworkCore;
 using Macrofy.Data;
 using Macrofy.Models;
 using Macrofy.Services;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ── Forwarded headers (за HTTPS/Proxy) ─────────────────────────────
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+	options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
+
 // ── Database ──────────────────────────────────────────────────────
+// Взима connection string: User Secrets локално, Environment Variable за Production
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+		?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
 
-    // SQL Server on Railway
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-        ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
-    builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<AppDbContext>(options =>
+	options.UseNpgsql(connectionString));
 
+// ── Identity ──────────────────────────────────────────────────────
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
-    options.User.RequireUniqueEmail = true;
-    options.SignIn.RequireConfirmedEmail = false;
+	options.Password.RequireDigit = true;
+	options.Password.RequireLowercase = true;
+	options.Password.RequireUppercase = true;
+	options.Password.RequiredLength = 6;
+	options.Password.RequireNonAlphanumeric = false;
+	options.User.RequireUniqueEmail = true;
+	options.SignIn.RequireConfirmedEmail = false;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
+// ── Cookie настройки ─────────────────────────────────────────────
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Account/Login";
-    options.LogoutPath = "/Account/Logout";
-    options.AccessDeniedPath = "/Account/AccessDenied";
-    options.ExpireTimeSpan = TimeSpan.FromDays(7);
-    options.SlidingExpiration = true;
+	options.LoginPath = "/Account/Login";
+	options.LogoutPath = "/Account/Logout";
+	options.AccessDeniedPath = "/Account/AccessDenied";
+	options.ExpireTimeSpan = TimeSpan.FromDays(7);
+	options.SlidingExpiration = true;
+
+	// Production security
+	options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+	options.Cookie.SameSite = SameSiteMode.Strict;
 });
 
 // ── App Services ──────────────────────────────────────────────────
@@ -44,10 +56,12 @@ builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
 // ── Middleware ────────────────────────────────────────────────────
+app.UseForwardedHeaders();
+
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+	app.UseExceptionHandler("/Home/Error");
+	app.UseHsts();
 }
 
 app.UseHttpsRedirection();
@@ -57,19 +71,27 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+	name: "default",
+	pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// ── Seed Database ─────────────────────────────────────────────────
+// ── Migrate + Seed Database ───────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
-    try { await DbSeeder.SeedAsync(scope.ServiceProvider); }
-    catch (Exception ex)
-    {
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Error seeding database");
-    }
-}
+	var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
+	// Миграции - ако има нови, ще се приложат
+	await db.Database.MigrateAsync();
+
+	// Seed (demo users, sample data)
+	try
+	{
+		await DbSeeder.SeedAsync(scope.ServiceProvider);
+	}
+	catch (Exception ex)
+	{
+		var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+		logger.LogError(ex, "Error seeding database");
+	}
+}
 
 app.Run();

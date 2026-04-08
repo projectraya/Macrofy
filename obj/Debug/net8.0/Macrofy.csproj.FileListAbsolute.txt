@@ -174,3 +174,4 @@ C:\Users\rmink\OneDrive\Desktop\Projects\Macrofy-v2\Macrofy\obj\Debug\net8.0\ref
 C:\Users\rmink\OneDrive\Desktop\Projects\Macrofy-v2\Macrofy\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Users\rmink\OneDrive\Desktop\Projects\Macrofy-v2\Macrofy\bin\Debug\net8.0\Npgsql.dll
 C:\Users\rmink\OneDrive\Desktop\Projects\Macrofy-v2\Macrofy\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+C:\Users\rmink\OneDrive\Desktop\Projects\Macrofy-v2\Macrofy\obj\Debug\net8.0\Macrofy.sourcelink.json
