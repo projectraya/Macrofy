@@ -6,6 +6,8 @@ using Macrofy.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 // ── Forwarded headers (за HTTPS/Proxy) ─────────────────────────────
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
