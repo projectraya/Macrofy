@@ -1,0 +1,90 @@
+﻿@model List<Macrofy.Models.Event>
+@{
+    ViewData["Title"] = "Управление на събития";
+}
+<div class="dash-page">
+    <div class="dash-header">
+        <div style="max-width:1180px;margin:0 auto"><h1>Събития</h1></div>
+    </div>
+    <div class="dash-content">
+        @foreach (var ev in Model)
+        {
+            var spots = ev.Registrations.Count(r => r.Status != Macrofy.Models.Enum.RegistrationStatus.Rejected);
+            <div class="card" style="margin-bottom:24px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+                    <div>
+                        <h2 style="color:var(--teal);font-size:1.1rem;margin-bottom:4px">@ev.Title</h2>
+                        <div style="font-size:.84rem;color:var(--muted);font-weight:600">@ev.EventDate.ToString("dd.MM.yyyy HH:mm") · @ev.Location</div>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:var(--teal)">@spots / @ev.MaxSpots</div>
+                        <div style="font-size:.76rem;color:var(--muted);font-weight:700;text-transform:uppercase">записани</div>
+                    </div>
+                </div>
+
+                @if (ev.Registrations.Any())
+                {
+                    <div style="overflow-x:auto">
+                        <table class="tbl">
+                            <thead><tr><th>Участник</th><th>Имейл</th><th>Телефон</th><th>Макроси</th><th>Алергии</th><th>Статус</th><th></th></tr></thead>
+                            <tbody>
+                                @foreach (var r in ev.Registrations.OrderBy(r => r.RegisteredAt))
+                                {
+                                    <tr>
+                                        <td><strong>@r.User.FullName</strong></td>
+                                        <td>@r.ContactEmail</td>
+                                        <td style="color:var(--muted)">@(r.ContactPhone ?? "–")</td>
+                                        <td style="font-size:.8rem">
+                                            @if (r.User.DailyCalories.HasValue)
+                                            {
+                                                <span>@r.User.DailyCalories ккал · П:@r.User.DailyProtein г · В:@r.User.DailyCarbs г · М:@r.User.DailyFat г</span>
+                                            }
+                                            else
+                                            {
+                                                <span style="color:var(--muted)">Не е попълнен</span>
+                                            }
+                                        </td>
+                                        <td style="font-size:.8rem;color:var(--muted)">
+                                            @(r.User.NoAllergies ? "Без алергии" : (r.User.AllergyList ?? "–"))
+                                        </td>
+                                        <td>
+                                            <span class="badge" style="background:@(r.Status==Macrofy.Models.Enum.RegistrationStatus.Confirmed?"#d1fae5":r.Status==Macrofy.Models.Enum.RegistrationStatus.Rejected?"#fee2e2":"#fef3c7");color:@(r.Status==Macrofy.Models.Enum.RegistrationStatus.Confirmed?"#065f46":r.Status==Macrofy.Models.Enum.RegistrationStatus.Rejected?"#991b1b":"#92400e")">
+                                                @(r.Status switch { Macrofy.Models.Enum.RegistrationStatus.Confirmed => "Потвърден", Macrofy.Models.Enum.RegistrationStatus.Rejected => "Отказан", _ => "Изчаква" })
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div style="display:flex;gap:6px">
+                                                @if (r.Status != Macrofy.Models.Enum.RegistrationStatus.Confirmed)
+                                                {
+                                                    <form asp-action="UpdateRegistration" method="post" style="display:inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="id" value="@r.Id">
+                                                        <input type="hidden" name="status" value="Confirmed">
+                                                        <button type="submit" class="btn btn-primary btn-sm">Потвърди</button>
+                                                    </form>
+                                                }
+                                                @if (r.Status != Macrofy.Models.Enum.RegistrationStatus.Rejected)
+                                                {
+                                                    <form asp-action="UpdateRegistration" method="post" style="display:inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="id" value="@r.Id">
+                                                        <input type="hidden" name="status" value="Rejected">
+                                                        <button type="submit" class="btn btn-danger btn-sm">Откажи</button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p style="color:var(--muted);font-size:.9rem;font-weight:500">Все още няма записани участници.</p>
+                }
+            </div>
+        }
+    </div>
+</div>

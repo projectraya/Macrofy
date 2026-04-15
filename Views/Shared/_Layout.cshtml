@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@(ViewData["Title"] != null ? ViewData["Title"] + " – " : "")Macrofy</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
+
+<div class="announce-bar" id="announceBar">
+    Macrofy Demo Вечер — <a asp-controller="Event" asp-action="Index">Запиши се безплатно</a>
+</div>
 
 <nav class="navbar" id="navbar">
   <div class="nav-inner">
@@ -22,6 +26,7 @@
         @if (User.IsInRole("Client"))
         {
           <a asp-controller="Dashboard" asp-action="Index" class="nav-link">Начало</a>
+          <a asp-controller="Event" asp-action="Index" class="nav-link">Събития</a>
           <a asp-controller="Dashboard" asp-action="Chefs" class="nav-link">Готвачи</a>
           <a asp-controller="Dashboard" asp-action="Orders" class="nav-link">Поръчки</a>
           <a asp-controller="Dashboard" asp-action="MacroProfile" class="nav-link">Макро профил</a>
@@ -38,6 +43,7 @@
           <a asp-controller="Admin" asp-action="Chefs" class="nav-link">Готвачи</a>
           <a asp-controller="Admin" asp-action="Users" class="nav-link">Потребители</a>
           <a asp-controller="Admin" asp-action="Partners" class="nav-link">Партньори</a>
+          <a asp-controller="Admin" asp-action="Events" class="nav-link">Събития</a>
         }
       </div>
       <div class="nav-user">
@@ -54,7 +60,8 @@
     else
     {
       <div class="nav-links">
-        <a href="#problem" class="nav-link">Как работи</a>
+        <a href="#how" class="nav-link">Как работи</a>
+        <a asp-controller="Event" asp-action="Index" class="nav-link">Събития</a>
         <a href="#chefs" class="nav-link">Готвачи</a>
         <a asp-controller="Partner" asp-action="Apply" class="nav-link">Партньори</a>
       </div>
@@ -75,6 +82,7 @@
     @if (User.IsInRole("Client"))
     {
       <a asp-controller="Dashboard" asp-action="Index">Начало</a>
+      <a asp-controller="Event" asp-action="Index">Събития</a>
       <a asp-controller="Dashboard" asp-action="Chefs">Готвачи</a>
       <a asp-controller="Dashboard" asp-action="Orders">Поръчки</a>
       <a asp-controller="Dashboard" asp-action="MacroProfile">Макро профил</a>
@@ -83,13 +91,11 @@
     {
       <a asp-controller="Chef" asp-action="Index">Табло</a>
       <a asp-controller="Chef" asp-action="EditProfile">Моят профил</a>
-      <a asp-controller="Chef" asp-action="Clients">Клиенти</a>
     }
     else if (User.IsInRole("Admin"))
     {
       <a asp-controller="Admin" asp-action="Index">Табло</a>
-      <a asp-controller="Admin" asp-action="Chefs">Готвачи</a>
-      <a asp-controller="Admin" asp-action="Users">Потребители</a>
+      <a asp-controller="Admin" asp-action="Events">Събития</a>
     }
     <form asp-controller="Account" asp-action="Logout" method="post" style="margin-top:8px">
       @Html.AntiForgeryToken()
@@ -99,28 +105,43 @@
   else
   {
     <a asp-controller="Account" asp-action="Login">Вход</a>
-    <a asp-controller="Account" asp-action="Register" style="font-weight:700;color:var(--dark)">Регистрация</a>
+    <a asp-controller="Event" asp-action="Index">Събития</a>
+    <a asp-controller="Account" asp-action="Register" style="color:var(--teal);font-weight:900">Регистрация</a>
   }
 </div>
 
 @if (TempData["Success"] != null)
-{
-  <div class="toast toast-success" id="toast">@TempData["Success"]</div>
-}
+{ <div class="toast toast-success" id="toast">@TempData["Success"]</div> }
 @if (TempData["Error"] != null)
-{
-  <div class="toast toast-error" id="toast">@TempData["Error"]</div>
-}
+{ <div class="toast toast-error" id="toast">@TempData["Error"]</div> }
 
 <main>@RenderBody()</main>
 
 <script>
-window.addEventListener('scroll',()=>document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>20));
-document.getElementById('navHam')?.addEventListener('click',()=>document.getElementById('mobMenu').classList.toggle('open'));
-document.getElementById('avatarBtn')?.addEventListener('click',e=>{e.stopPropagation();document.getElementById('navDropdown')?.classList.toggle('show');});
-document.addEventListener('click',()=>document.getElementById('navDropdown')?.classList.remove('show'));
-const t=document.getElementById('toast');
-if(t)setTimeout(()=>t.classList.add('hide'),4500);
+// Announce bar height adjust
+const bar = document.getElementById('announceBar');
+const nav = document.getElementById('navbar');
+const mob = document.getElementById('mobMenu');
+if (!bar) { nav?.classList.add('no-bar'); mob?.classList.add('no-bar'); }
+
+window.addEventListener('scroll', () => {
+  nav?.classList.toggle('scrolled', window.scrollY > 20);
+});
+
+document.getElementById('navHam')?.addEventListener('click', () => {
+  document.getElementById('mobMenu').classList.toggle('open');
+});
+
+document.getElementById('avatarBtn')?.addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('navDropdown')?.classList.toggle('show');
+});
+document.addEventListener('click', () => {
+  document.getElementById('navDropdown')?.classList.remove('show');
+});
+
+const toast = document.getElementById('toast');
+if (toast) setTimeout(() => toast.classList.add('hide'), 4500);
 </script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>

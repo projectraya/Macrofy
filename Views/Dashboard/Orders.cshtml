@@ -8,11 +8,15 @@
     </div>
   </div>
   <div class="dash-content">
-    @if (Model.Any())
-    {
-      <div class="card" style="padding:0;overflow:hidden">
-        <div style="overflow-x:auto">
-        <table class="tbl">
+        @if (Model.Any())
+        {
+            <div class="card" style="padding:0;overflow:hidden">
+                <div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+                    <h2 style="font-size:1.05rem;font-weight:700;color:var(--dark)">Всички поръчки (@Model.Count)</h2>
+                    <a asp-controller="Dashboard" asp-action="Chefs" class="btn btn-primary btn-sm">Нова поръчка</a>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="tbl">
           <thead><tr><th>ID</th><th>Готвач</th><th>Начало</th><th>Край</th><th>Статус</th><th>Цена</th><th></th></tr></thead>
           <tbody>
           @foreach (var o in Model)

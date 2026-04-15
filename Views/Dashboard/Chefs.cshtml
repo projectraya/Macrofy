@@ -3,81 +3,106 @@
 
 <div class="dash-page">
   <div class="dash-header">
-    <div style="max-width:1200px;margin:0 auto">
-      <h1>Нашите готвачи 👨‍🍳</h1>
+    <div style="max-width:1160px;margin:0 auto">
+      <h1>Нашите готвачи</h1>
       <p>Всеки готвач е верифициран и специализиран в различни хранителни режими.</p>
     </div>
   </div>
-
   <div class="dash-content">
-    <!-- Filters -->
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
-      <a asp-action="Chefs" class="btn @(ViewBag.CurrentSpecialty == null ? "btn-primary" : "btn-secondary") btn-sm">Всички</a>
-      @foreach (var sp in Enum.GetValues<Macrofy.Models.Enum.ChefSpecialty>())
-      {
-        var label = sp switch {
-          Macrofy.Models.Enum.ChefSpecialty.SportNutrition => "Спортно хранене",
-          Macrofy.Models.Enum.ChefSpecialty.Keto => "Кето",
-          Macrofy.Models.Enum.ChefSpecialty.Vegan => "Веганска",
-          Macrofy.Models.Enum.ChefSpecialty.Mediterranean => "Средиземноморска",
-          Macrofy.Models.Enum.ChefSpecialty.WeightLoss => "Отслабване",
-          _ => "Обща"
-        };
-        <a asp-action="Chefs" asp-route-specialty="@sp.ToString()"
-           class="btn @(ViewBag.CurrentSpecialty == sp.ToString() ? "btn-primary" : "btn-secondary") btn-sm">@label</a>
-      }
+
+    <!-- Filter bar -->
+    <div class="card" style="margin-bottom:22px;padding:20px">
+      <form method="get" asp-action="Chefs" id="filterForm" style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end">
+        <div style="flex:1;min-width:180px">
+          <label style="display:block;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Специализация</label>
+          <select name="specialty" class="fg" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--rs);font-size:.88rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none" onchange="this.form.submit()">
+            <option value="">Всички специализации</option>
+            @foreach (var sp in Enum.GetValues<Macrofy.Models.Enum.ChefSpecialty>())
+            {
+              var label = sp switch {
+                Macrofy.Models.Enum.ChefSpecialty.SportNutrition => "Спортно хранене",
+                Macrofy.Models.Enum.ChefSpecialty.Keto => "Кето",
+                Macrofy.Models.Enum.ChefSpecialty.Vegan => "Веганска кухня",
+                Macrofy.Models.Enum.ChefSpecialty.Mediterranean => "Средиземноморска",
+                Macrofy.Models.Enum.ChefSpecialty.WeightLoss => "Отслабване",
+                _ => "Обща здравословна"
+              };
+              <option value="@sp" selected=@(ViewBag.FilterSpecialty?.ToString() == sp.ToString() ? "selected" : "")>
+                  @label
+                  </option>
+            }
+          </select>
+        </div>
+        <div style="flex:1;min-width:140px">
+          <label style="display:block;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Мин. рейтинг</label>
+          <select name="minRating" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--rs);font-size:.88rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none" onchange="this.form.submit()">
+            <option value="">Всички</option>
+            <option value="4" selected=@(ViewBag.FilterMinRating?.ToString() == "4" ? "selected" : "")>4.0 и нагоре</option>
+            <option value="4.5" selected=@(ViewBag.FilterMinRating?.ToString() == "4.5" ? "selected" : "")>4.5 и нагоре</option>
+            <option value="4.8" selected=@(ViewBag.FilterMinRating?.ToString() == "4.8" ? "selected" : "")>4.8 и нагоре</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:140px">
+          <label style="display:block;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Наличност</label>
+          <select name="available" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--rs);font-size:.88rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none" onchange="this.form.submit()">
+            <option value="">Всички</option>
+            <option value="true" selected=@(ViewBag.FilterAvailable?.ToString() == "true" ? "selected" : "")>Само налични</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:140px">
+          <label style="display:block;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Сортирай по</label>
+          <select name="sortBy" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--rs);font-size:.88rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none" onchange="this.form.submit()">
+            <option value="rating" selected=@(ViewBag.FilterSortBy?.ToString() == "rating" ? "selected" : "")>Рейтинг</option>
+            <option value="experience" selected="@(ViewBag.FilterSortBy?.ToString() == "experience")">Опит</option>
+            <option value="price_asc" selected=@(ViewBag.FilterSortBy?.ToString() == "price_asc" ? "selected" : "")>Цена (ниска към висока)</option>
+            <option value="price_desc" selected=@(ViewBag.FilterSortBy?.ToString() == "price_desc" ? "selected" : "")>Цена (висока към ниска)</option>
+          </select>
+        </div>
+        @if (ViewBag.FilterSpecialty != null || ViewBag.FilterMinRating != null || ViewBag.FilterAvailable != null)
+        {
+          <a asp-action="Chefs" class="btn btn-secondary btn-sm" style="align-self:flex-end">Изчисти филтрите</a>
+        }
+      </form>
+      <div style="margin-top:12px;font-size:.8rem;color:var(--muted)">Намерени: <strong style="color:var(--dark)">@Model.Count готвача</strong></div>
     </div>
 
     @if (Model.Any())
     {
       <div class="chef-grid">
-        @foreach (var chef in Model)
-        {
-          <div class="chef-card">
-            <div class="chef-card-top">
-              <div class="chef-avatar-wrap">👨‍🍳</div>
-              <h3>@chef.FullName</h3>
-              <div class="specialty-label">@chef.Specialties</div>
-            </div>
-            <div class="chef-card-body">
-              <p class="chef-bio">@chef.Bio</p>
-              <div class="chef-meta">
-                <div class="chef-rating"><span class="star-icon">★</span> @chef.Rating.ToString("0.0") (@chef.TotalReviews оценки)</div>
-                <div class="chef-rate">@chef.HourlyRate лв/ч</div>
-              </div>
-              @if (!string.IsNullOrEmpty(chef.Location))
-              {
-                <div style="font-size:.78rem;color:var(--muted);margin-bottom:10px">📍 @chef.Location</div>
-              }
-              <div style="font-size:.78rem;color:var(--muted);margin-bottom:10px">🏆 @chef.ExperienceYears год. опит</div>
-              <div class="@("avail-dot" + (chef.IsAvailable ? "" : " off"))">
-                @(chef.IsAvailable ? "Наличен за нови клиенти" : "Зает в момента")
-              </div>
-              @if (chef.IsVerified)
-              {
-                <div style="font-size:.75rem;color:var(--lime);font-weight:700;margin-bottom:14px">✓ Верифициран готвач</div>
-              }
-              @if (chef.IsAvailable)
-              {
-                <a asp-controller="Order" asp-action="Create" asp-route-chefId="@chef.Id"
-                   class="btn btn-primary btn-sm" style="width:100%">Поръчай при @chef.FullName.Split(' ')[0] →</a>
-              }
-              else
-              {
-                <button class="btn btn-secondary btn-sm" style="width:100%" disabled>Зает в момента</button>
-              }
-            </div>
+      @foreach (var c in Model)
+      {
+        <div class="chef-card">
+          <div class="chef-card-head">
+            <div class="chef-initials">@c.FullName[0]</div>
+            <h3>@c.FullName</h3>
+            <div class="chef-spec">@c.Specialties</div>
           </div>
-        }
+          <div class="chef-card-body">
+            <p class="chef-bio">@c.Bio</p>
+            <div class="chef-meta">
+              <div class="chef-rating"><span class="star">★</span> @c.Rating.ToString("0.0") (@c.TotalReviews оценки)</div>
+              <div class="chef-rate">@c.HourlyRate лв/ч</div>
+            </div>
+            @if (!string.IsNullOrEmpty(c.Location))
+            { <div style="font-size:.76rem;color:var(--muted);margin-bottom:8px">@c.Location · @c.ExperienceYears г. опит</div> }
+            @if (c.IsVerified)
+            { <div class="chef-verified">Верифициран готвач</div> }
+            <div class="@("chef-avail" + (c.IsAvailable ? "" : " unavail"))">@(c.IsAvailable ? "Наличен за нови клиенти" : "Зает в момента")</div>
+            @if (c.IsAvailable)
+            { <a asp-controller="Order" asp-action="Create" asp-route-chefId="@c.Id" class="btn btn-primary btn-sm btn-full">Поръчай</a> }
+            else
+            { <button class="btn btn-secondary btn-sm btn-full" disabled>Зает в момента</button> }
+          </div>
+        </div>
+      }
       </div>
     }
     else
     {
       <div class="empty-state">
-        <div class="empty-icon">👨‍🍳</div>
         <h3>Няма намерени готвачи</h3>
-        <p>Опитай с друга специализация.</p>
-        <a asp-action="Chefs" class="btn btn-primary">Виж всички</a>
+        <p>Опитай с по-широки критерии за търсене.</p>
+        <a asp-action="Chefs" class="btn btn-primary btn-sm">Изчисти филтрите</a>
       </div>
     }
   </div>

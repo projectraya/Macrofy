@@ -133,4 +133,24 @@ public class AdminController : Controller
             }).ToListAsync();
         return View(orders);
     }
+
+	public async Task<IActionResult> Events()
+	{
+		var events = await _db.Events
+			.Include(e => e.Registrations).ThenInclude(r => r.User)
+			.ToListAsync();
+		return View(events);
+	}
+
+	[HttpPost]
+	[ValidateAntiForgeryToken]
+	public async Task<IActionResult> UpdateRegistration(int id, Macrofy.Models.Enum.RegistrationStatus status)
+	{
+		var reg = await _db.EventRegistrations.FindAsync(id);
+		if (reg == null) return NotFound();
+		reg.Status = status;
+		await _db.SaveChangesAsync();
+		TempData["Success"] = "Статусът е обновен.";
+		return RedirectToAction("Events");
+	}
 }

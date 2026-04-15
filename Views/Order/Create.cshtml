@@ -1,100 +1,173 @@
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
 @model Macrofy.ViewModels.CreateOrderViewModel
-@{ ViewData["Title"] = "Нова поръчка"; }
+@{
+    ViewData["Title"] = "Нова поръчка";
+    var googleApiKey = Configuration?["GoogleMaps:ApiKey"] ?? "";
+}
 
 <div class="dash-page">
-  <div class="dash-header">
-    <div style="max-width:1200px;margin:0 auto">
-      <h1>Поръчай при @Model.ChefName</h1>
-      <p>Попълни детайлите за доставка и избери период.</p>
-    </div>
-  </div>
-
-  <div class="dash-content">
-    <div style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start">
-      <div class="card">
-        <h3 style="color:var(--dark);margin-bottom:24px">Детайли на поръчката</h3>
-        <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
-        <form asp-action="Create" method="post">
-          @Html.AntiForgeryToken()
-          <input type="hidden" asp-for="ChefProfileId">
-          <input type="hidden" asp-for="ChefName">
-          <input type="hidden" asp-for="HourlyRate">
-
-          <div class="form-group">
-            <label asp-for="DeliveryAddress">Адрес за доставка</label>
-            <input asp-for="DeliveryAddress" placeholder="ул. Витоша 15, ет. 3, ап. 7, София">
-            <span asp-validation-for="DeliveryAddress" class="field-validation-error"></span>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label asp-for="StartDate">Начална дата</label>
-              <input asp-for="StartDate" type="date" id="startDate" oninput="calcTotal()">
-              <span asp-validation-for="StartDate" class="field-validation-error"></span>
-            </div>
-            <div class="form-group">
-              <label asp-for="EndDate">Крайна дата</label>
-              <input asp-for="EndDate" type="date" id="endDate" oninput="calcTotal()">
-              <span asp-validation-for="EndDate" class="field-validation-error"></span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label asp-for="Notes">Бележки (алергии, предпочитания)</label>
-            <textarea asp-for="Notes" placeholder="Напр. без свинско, алергия към ядки, предпочитам пиле..."></textarea>
-          </div>
-
-          <button type="submit" class="form-submit">Изпрати поръчката →</button>
-        </form>
-      </div>
-
-      <div style="position:sticky;top:90px">
-        <div class="card card-hover" style="margin-bottom:16px">
-          <div style="font-size:.72rem;font-weight:700;color:var(--lime);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">Готвач</div>
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-            <div style="width:48px;height:48px;background:linear-gradient(135deg,var(--lime),var(--mid));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">👨‍🍳</div>
-            <div>
-              <h3 style="color:var(--dark);font-size:.95rem">@Model.ChefName</h3>
-              <div style="font-size:.78rem;color:var(--muted)">@Model.HourlyRate лв/ч</div>
-            </div>
-          </div>
+    <div class="dash-header">
+        <div style="max-width:1160px;margin:0 auto">
+            <h1>Поръчай при @Model.ChefName</h1>
+            <p>Попълни детайлите за доставка и избери период.</p>
         </div>
-
-        <div class="macro-widget">
-          <h4>Обобщение</h4>
-          <div style="display:flex;flex-direction:column;gap:12px">
-            <div style="display:flex;justify-content:space-between;font-size:.85rem;opacity:.8">
-              <span>Период</span>
-              <span id="sumDays">–</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:.85rem;opacity:.8">
-              <span>Ставка</span>
-              <span>@Model.HourlyRate лв/ч × 2ч/ден</span>
-            </div>
-            <div style="border-top:1px solid rgba(255,255,255,.14);padding-top:12px;display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:.9rem;font-weight:600">Приблизителна цена</span>
-              <span style="font-family:'Instrument Serif',serif;font-size:1.6rem" id="sumTotal">–</span>
-            </div>
-          </div>
-          <div style="font-size:.73rem;opacity:.55;margin-top:12px">Финалната цена се потвърждава от готвача.</div>
-        </div>
-      </div>
     </div>
-  </div>
+
+    <div class="dash-content">
+        <div style="display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start">
+            <div class="card">
+                <h3 style="color:var(--dark);margin-bottom:22px;font-size:1rem;font-weight:700">Детайли на поръчката</h3>
+                <div asp-validation-summary="ModelOnly" class="val-summary"></div>
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="ChefProfileId">
+                    <input type="hidden" asp-for="ChefName">
+                    <input type="hidden" asp-for="HourlyRate">
+
+                    <div class="fg">
+                        <label asp-for="DeliveryAddress">Адрес за доставка</label>
+                        <div style="position:relative">
+                            <input asp-for="DeliveryAddress"
+                                   id="addressInput"
+                                   placeholder="Започни да пишеш адрес в България..."
+                                   autocomplete="off">
+                            <div id="addressSuggestions"
+                                 style="display:none;position:absolute;top:100%;left:0;right:0;
+                background:#fff;border:1.5px solid var(--border);border-top:none;
+                border-radius:0 0 var(--rs) var(--rs);z-index:50;
+                box-shadow:var(--shadow-md);max-height:220px;overflow-y:auto"></div>
+                        </div>
+                        <span asp-validation-for="DeliveryAddress" class="fv-error"></span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="fg">
+                            <label asp-for="StartDate">Начална дата</label>
+                            <input asp-for="StartDate" type="date" id="startDate" oninput="calcTotal()">
+                            <span asp-validation-for="StartDate" class="fv-error"></span>
+                        </div>
+                        <div class="fg">
+                            <label asp-for="EndDate">Крайна дата</label>
+                            <input asp-for="EndDate" type="date" id="endDate" oninput="calcTotal()">
+                            <span asp-validation-for="EndDate" class="fv-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="fg">
+                        <label asp-for="Notes">Бележки (алергии, предпочитания)</label>
+                        <textarea asp-for="Notes" placeholder="Напр. без свинско, алергия към ядки, предпочитам пиле..."></textarea>
+                    </div>
+
+                    <button type="submit" class="form-submit">Изпрати поръчката</button>
+                </form>
+            </div>
+
+            <div style="position:sticky;top:82px;display:flex;flex-direction:column;gap:16px">
+                <div class="card">
+                    <div style="font-size:.7rem;font-weight:700;color:var(--lime);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px">Готвач</div>
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--lime),var(--mid));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:1.1rem;color:#fff;flex-shrink:0">@Model.ChefName[0]</div>
+                        <div>
+                            <h3 style="color:var(--dark);font-size:.92rem">@Model.ChefName</h3>
+                            <div style="font-size:.78rem;color:var(--muted)">@Model.HourlyRate лв/ч</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="macro-widget">
+                    <h4>Обобщение</h4>
+                    <div style="display:flex;flex-direction:column;gap:11px">
+                        <div style="display:flex;justify-content:space-between;font-size:.84rem;opacity:.78"><span>Период</span><span id="sumDays">–</span></div>
+                        <div style="display:flex;justify-content:space-between;font-size:.84rem;opacity:.78"><span>Ставка</span><span>@Model.HourlyRate лв/ч × 2 ч/ден</span></div>
+                        <div style="border-top:1px solid rgba(255,255,255,.13);padding-top:11px;display:flex;justify-content:space-between;align-items:center">
+                            <span style="font-size:.88rem;font-weight:600">Приблизителна цена</span>
+                            <span style="font-family:'Instrument Serif',serif;font-size:1.5rem" id="sumTotal">–</span>
+                        </div>
+                    </div>
+                    <div style="font-size:.72rem;opacity:.5;margin-top:11px">Финалната цена се потвърждава от готвача.</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
-<script>
-const rate = @Model.HourlyRate;
-function calcTotal() {
-  const s = document.getElementById('startDate').value;
-  const e = document.getElementById('endDate').value;
-  if (!s || !e) return;
-  const days = Math.max(0, (new Date(e) - new Date(s)) / 86400000);
-  const total = days * rate * 2;
-  document.getElementById('sumDays').textContent = days + ' дни';
-  document.getElementById('sumTotal').textContent = total.toFixed(0) + ' лв';
-}
-window.addEventListener('DOMContentLoaded', calcTotal);
-</script>
+    <script>
+        const rate = @Model.HourlyRate;
+        function calcTotal() {
+          const s = document.getElementById('startDate').value;
+          const e = document.getElementById('endDate').value;
+          if (!s || !e) return;
+          const days = Math.max(0, (new Date(e)-new Date(s))/86400000);
+          document.getElementById('sumDays').textContent = days + ' дни';
+          document.getElementById('sumTotal').textContent = (days*rate*2).toFixed(0) + ' лв';
+        }
+        window.addEventListener('DOMContentLoaded', calcTotal);
+
+        // ── Address autocomplete via Nominatim (OpenStreetMap) ────────────
+        let debounceTimer;
+        const input  = document.getElementById('addressInput');
+        const box    = document.getElementById('addressSuggestions');
+
+        input.addEventListener('input', () => {
+          clearTimeout(debounceTimer);
+          const val = input.value.trim();
+          if (val.length < 3) { box.style.display = 'none'; return; }
+          debounceTimer = setTimeout(() => fetchSuggestions(val), 350);
+        });
+
+        async function fetchSuggestions(query) {
+          try {
+            const url = `https://nominatim.openstreetmap.org/search?` +
+              `q=${encodeURIComponent(query + ', България')}&` +
+              `format=json&addressdetails=1&limit=5&countrycodes=bg&` +
+              `accept-language=bg`;
+            const res  = await fetch(url, { headers: { 'Accept-Language': 'bg' } });
+            const data = await res.json();
+            if (!data.length) { box.style.display = 'none'; return; }
+            box.innerHTML = data.map(p => {
+              const main = p.address.road
+                ? (p.address.road + (p.address.house_number ? ' ' + p.address.house_number : ''))
+                : p.display_name.split(',')[0];
+              const secondary = [p.address.city||p.address.town||p.address.village, p.address.postcode]
+                .filter(Boolean).join(', ');
+              return `<div class="addr-item" onclick="selectAddress('${escAddr(p.display_name)}')">
+                <div style="font-weight:500;color:var(--dark);font-size:.86rem">${main}</div>
+                <div style="font-size:.76rem;color:var(--muted)">${secondary}</div>
+              </div>`;
+            }).join('');
+            box.style.display = 'block';
+          } catch(e) { box.style.display = 'none'; }
+        }
+
+        function escAddr(s) { return s.replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+        function selectAddress(addr) {
+          input.value = addr;
+          box.style.display = 'none';
+        }
+
+        document.addEventListener('click', e => {
+          if (!input.contains(e.target) && !box.contains(e.target))
+            box.style.display = 'none';
+        });
+    </script>
+
+    <style>
+        .addr-item {
+            padding: 11px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: background .13s;
+        }
+
+            .addr-item:last-child {
+                border-bottom: none;
+            }
+
+            .addr-item:hover {
+                background: var(--cream);
+            }
+    </style>
 }

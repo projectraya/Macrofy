@@ -1,158 +1,352 @@
 @model Macrofy.ViewModels.MacroProfileViewModel
-@{ ViewData["Title"] = "Макро профил"; }
+@{
+    ViewData["Title"] = "Макро профил";
+}
 
 <div class="dash-page">
-  <div class="dash-header">
-    <div style="max-width:1200px;margin:0 auto">
-      <h1>Макро профил</h1>
-      <p>Въведи данните си и ще изчислим точните ти дневни нужди.</p>
+    <div class="dash-header">
+        <div style="max-width:1160px;margin:0 auto">
+            <h1>Макро профил</h1>
+            <p>Въведи данните си или добави макросите директно от препоръка на специалист.</p>
+        </div>
     </div>
-  </div>
 
-  <div class="dash-content">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
-      <div class="card">
-        <h3 style="color:var(--dark);margin-bottom:24px">Лични данни</h3>
-        <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
-        <form asp-action="MacroProfile" method="post" id="macroForm">
-          @Html.AntiForgeryToken()
-          <div class="form-row">
-            <div class="form-group">
-              <label asp-for="Age">Възраст</label>
-              <input asp-for="Age" type="number" placeholder="25" oninput="calcPreview()">
-              <span asp-validation-for="Age" class="field-validation-error"></span>
-            </div>
-            <div class="form-group">
-              <label asp-for="WeightKg">Тегло (кг)</label>
-              <input asp-for="WeightKg" type="number" step="0.1" placeholder="70" oninput="calcPreview()">
-              <span asp-validation-for="WeightKg" class="field-validation-error"></span>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label asp-for="HeightCm">Ръст (см)</label>
-              <input asp-for="HeightCm" type="number" step="0.1" placeholder="175" oninput="calcPreview()">
-              <span asp-validation-for="HeightCm" class="field-validation-error"></span>
-            </div>
-            <div class="form-group">
-              <label asp-for="Gender">Пол</label>
-              <select asp-for="Gender" onchange="calcPreview()">
-                <option value="Male">Мъж</option>
-                <option value="Female">Жена</option>
-                <option value="Other">Друг</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label asp-for="ActivityLevel">Ниво на активност</label>
-            <select asp-for="ActivityLevel" onchange="calcPreview()">
-              <option value="Sedentary">Заседнал (офис работа)</option>
-              <option value="Light">Леко активен (1-2 пъти/седм.)</option>
-              <option value="Moderate">Умерено активен (3-5 пъти/седм.)</option>
-              <option value="Active">Много активен (6-7 пъти/седм.)</option>
-              <option value="VeryActive">Изключително активен</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label asp-for="Goal">Цел</label>
-            <select asp-for="Goal" onchange="calcPreview()">
-              <option value="LoseWeight">Отслабване</option>
-              <option value="Maintain">Поддържане на тегло</option>
-              <option value="GainMuscle">Набиране на мускулна маса</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label asp-for="DietaryPreference">Диетични предпочитания</label>
-            <select asp-for="DietaryPreference">
-              <option value="Standard">Стандартна диета</option>
-              <option value="Vegetarian">Вегетарианска</option>
-              <option value="Vegan">Веганска</option>
-              <option value="Keto">Кето</option>
-              <option value="GlutenFree">Без глутен</option>
-              <option value="DairyFree">Без лактоза</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label asp-for="Allergies">Алергии или специфики</label>
-            <textarea asp-for="Allergies" placeholder="Напр. алергия към ядки, без свинско месо..."></textarea>
-          </div>
-          <button type="submit" class="form-submit">Запази профила →</button>
-        </form>
-      </div>
+    <div class="dash-content macro-profile-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
 
-      <div>
-        <div class="macro-widget" id="macroPreview">
-          <h4>🧮 Преглед на макросите</h4>
-          <div id="previewContent" style="text-align:center;padding:20px;opacity:.6">
-            <div style="font-size:2rem;margin-bottom:8px">⚡</div>
-            <p style="font-size:.9rem">Въведи данните вляво и макросите ще се изчислят автоматично</p>
-          </div>
+        <!-- LEFT: forms -->
+        <div>
+            <!-- Mode toggle -->
+            <div style="display:flex;gap:4px;background:#fff;border:1px solid var(--border);border-radius:50px;padding:4px;width:fit-content;margin-bottom:20px">
+                <button onclick="setMode('calc')" id="btn-calc" class="btn btn-primary btn-sm" style="border-radius:50px">Изчисли автоматично</button>
+                <button onclick="setMode('manual')" id="btn-manual" class="btn btn-ghost btn-sm" style="border-radius:50px">Въведи ръчно</button>
+            </div>
+
+            <!-- CALCULATOR MODE -->
+            <div id="mode-calc">
+                <div class="card">
+                    <h3 style="color:var(--dark);margin-bottom:18px;font-size:.95rem;font-weight:700">Изчисляване по формула (Mifflin-St Jeor)</h3>
+                    <div asp-validation-summary="ModelOnly" class="val-summary"></div>
+                    <form asp-action="MacroProfile" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="InputMode" value="Calculate">
+                        <div class="form-row">
+                            <div class="fg"><label asp-for="Age">Възраст</label><input asp-for="Age" type="number" placeholder="25" min="15" max="80" oninput="calcPreview()"><span asp-validation-for="Age" class="fv-error"></span></div>
+                            <div class="fg"><label asp-for="WeightKg">Тегло (кг)</label><input asp-for="WeightKg" type="number" step="0.1" placeholder="70" oninput="calcPreview()"><span asp-validation-for="WeightKg" class="fv-error"></span></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="fg"><label asp-for="HeightCm">Ръст (см)</label><input asp-for="HeightCm" type="number" step="0.1" placeholder="175" oninput="calcPreview()"><span asp-validation-for="HeightCm" class="fv-error"></span></div>
+                            <div class="fg">
+                                <label asp-for="Gender">Пол</label>
+                                <select asp-for="Gender" onchange="calcPreview()">
+                                    <option value="Male">Мъж</option>
+                                    <option value="Female">Жена</option>
+                                    <option value="Other">Друг</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="fg">
+                            <label asp-for="ActivityLevel">Ниво на активност</label>
+                            <select asp-for="ActivityLevel" onchange="calcPreview()">
+                                <option value="Sedentary">Заседнал (офис, без спорт)</option>
+                                <option value="Light">Леко активен (1–2 тренировки/седм.)</option>
+                                <option value="Moderate">Умерено активен (3–5 тренировки/седм.)</option>
+                                <option value="Active">Много активен (6–7 тренировки/седм.)</option>
+                                <option value="VeryActive">Изключително активен (спортист)</option>
+                            </select>
+                        </div>
+                        <div class="fg">
+                            <label asp-for="Goal">Цел</label>
+                            <select asp-for="Goal" onchange="calcPreview()">
+                                <option value="LoseWeight">Отслабване (–400 ккал)</option>
+                                <option value="Maintain">Поддържане на тегло</option>
+                                <option value="GainMuscle">Набиране на мускулна маса (+300 ккал)</option>
+                            </select>
+                        </div>
+                        <div class="fg">
+                            <label asp-for="DietaryPreference">Диетични предпочитания</label>
+                            <select asp-for="DietaryPreference">
+                                <option value="Standard">Стандартна диета</option>
+                                <option value="Vegetarian">Вегетарианска</option>
+                                <option value="Vegan">Веганска</option>
+                                <option value="Keto">Кето</option>
+                                <option value="GlutenFree">Без глутен</option>
+                                <option value="DairyFree">Без лактоза</option>
+                            </select>
+                        </div>
+                        <div class="fg">
+                            <label asp-for="Allergies">Алергии или специфики</label>
+                            <textarea asp-for="Allergies" placeholder="Напр. алергия към ядки, без свинско месо..."></textarea>
+                        </div>
+                        <button type="submit" class="form-submit">Запази профила</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- MANUAL MODE -->
+            <div id="mode-manual" style="display:none">
+                <div class="card">
+                    <h3 style="color:var(--dark);margin-bottom:6px;font-size:.95rem;font-weight:700">Ръчно въвеждане</h3>
+                    <p style="font-size:.82rem;color:var(--muted);margin-bottom:18px">Разпредели макросите в проценти. Сборът трябва да е точно 100%.</p>
+                    <form asp-action="MacroProfileManual" method="post" id="manualForm">
+                        @Html.AntiForgeryToken()
+                        <div class="fg">
+                            <label>Дневни калории (ккал)</label>
+                            <input type="number" name="ManualCalories" id="m-cal" placeholder="2000" min="800" max="6000" required oninput="updateManualPreview()">
+                            <span id="cal-hint" style="font-size:.75rem;color:var(--muted);margin-top:3px;display:block"></span>
+                        </div>
+                        <div style="margin-bottom:18px">
+                            <label style="display:block;font-size:.75rem;font-weight:700;color:var(--dark);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Разпределение по макроси</label>
+                            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:10px">
+                                <div>
+                                    <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                                        <span style="font-size:.78rem;color:var(--muted)">Протеин</span>
+                                        <span id="prot-pct-lbl" style="font-size:.78rem;font-weight:700;color:var(--lime)">30%</span>
+                                    </div>
+                                    <input type="range" id="prot-slider" min="10" max="60" value="30" oninput="sliderChanged('prot')" style="width:100%;accent-color:var(--lime)">
+                                    <div style="font-size:.76rem;color:var(--muted);margin-top:3px;text-align:center" id="prot-g-lbl">– г</div>
+                                </div>
+                                <div>
+                                    <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                                        <span style="font-size:.78rem;color:var(--muted)">Въглехидрати</span>
+                                        <span id="carb-pct-lbl" style="font-size:.78rem;font-weight:700;color:#60a5fa">45%</span>
+                                    </div>
+                                    <input type="range" id="carb-slider" min="10" max="65" value="45" oninput="sliderChanged('carb')" style="width:100%;accent-color:#60a5fa">
+                                    <div style="font-size:.76rem;color:var(--muted);margin-top:3px;text-align:center" id="carb-g-lbl">– г</div>
+                                </div>
+                                <div>
+                                    <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                                        <span style="font-size:.78rem;color:var(--muted)">Мазнини</span>
+                                        <span id="fat-pct-lbl" style="font-size:.78rem;font-weight:700;color:#f59e0b">25%</span>
+                                    </div>
+                                    <input type="range" id="fat-slider" min="10" max="60" value="25" oninput="sliderChanged('fat')" style="width:100%;accent-color:#f59e0b">
+                                    <div style="font-size:.76rem;color:var(--muted);margin-top:3px;text-align:center" id="fat-g-lbl">– г</div>
+                                </div>
+                            </div>
+                            <div id="pct-total-bar" style="display:flex;align-items:center;gap:8px;font-size:.82rem;padding:8px 12px;border-radius:var(--rs);background:var(--lime-faint);border:1px solid rgba(122,184,48,.3)">
+                                <span>Сбор:</span>
+                                <strong id="pct-total" style="color:var(--dark)">100%</strong>
+                                <span id="pct-msg" style="color:var(--lime)">Идеално!</span>
+                            </div>
+                            <input type="hidden" name="ManualProteinPct" id="h-prot">
+                            <input type="hidden" name="ManualCarbsPct" id="h-carb">
+                            <input type="hidden" name="ManualFatPct" id="h-fat">
+                        </div>
+                        <div class="form-row">
+                            <div class="fg">
+                                <label>Диетични предпочитания</label>
+                                <select name="ManualDiet">
+                                    <option value="Standard">Стандартна</option>
+                                    <option value="Vegetarian">Вегетарианска</option>
+                                    <option value="Vegan">Веганска</option>
+                                    <option value="Keto">Кето</option>
+                                    <option value="GlutenFree">Без глутен</option>
+                                    <option value="DairyFree">Без лактоза</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="fg">
+                            <label>Алергии или специфики</label>
+                            <textarea name="ManualAllergies" placeholder="Напр. алергия към ядки..."></textarea>
+                        </div>
+                        <button type="submit" id="manual-submit" class="form-submit">Запази макросите</button>
+                    </form>
+                </div>
+            </div>
         </div>
 
-        <div class="card" style="margin-top:16px">
-          <h4 style="color:var(--dark);margin-bottom:16px">ℹ️ Как се изчислява</h4>
-          <p style="font-size:.85rem;color:var(--muted);line-height:1.7">
-            Използваме формулата <strong>Mifflin-St Jeor</strong> — най-точната формула за изчисляване на базалния метаболизъм (BMR). 
-            Умножаваме по коефициент за активност и коригираме спрямо целта ти.
-          </p>
-          <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
-            <div style="display:flex;gap:8px;align-items:center;font-size:.82rem;color:var(--muted)"><span style="color:var(--lime);font-weight:700">●</span> Протеин: 2г на кг телесно тегло</div>
-            <div style="display:flex;gap:8px;align-items:center;font-size:.82rem;color:var(--muted)"><span style="color:#60a5fa;font-weight:700">●</span> Мазнини: 25% от калориите</div>
-            <div style="display:flex;gap:8px;align-items:center;font-size:.82rem;color:var(--muted)"><span style="color:#f59e0b;font-weight:700">●</span> Въглехидрати: останалите калории</div>
-          </div>
+        <!-- RIGHT: pie chart preview -->
+        <div>
+            <div class="macro-widget" id="macroPreview">
+                <h4>Преглед на макросите</h4>
+                <div id="previewContent" style="text-align:center;padding:24px 0;opacity:.5">
+                    <p style="font-size:.86rem">Въведи данните вляво</p>
+                </div>
+            </div>
+            <div class="card" style="margin-top:16px">
+                <h4 style="color:var(--dark);margin-bottom:10px;font-size:.9rem;font-weight:700">Как се изчислява</h4>
+                <p style="font-size:.82rem;color:var(--muted);line-height:1.65">Формула <strong style="color:var(--dark)">Mifflin-St Jeor</strong> за базален метаболизъм, умножен по коефициент за активност и коригиран за цел.</p>
+                <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
+                    <div style="display:flex;gap:8px;align-items:center;font-size:.79rem;color:var(--muted)"><span style="width:9px;height:9px;border-radius:50%;background:var(--lime);flex-shrink:0;display:block"></span>1 г протеин = 4 ккал</div>
+                    <div style="display:flex;gap:8px;align-items:center;font-size:.79rem;color:var(--muted)"><span style="width:9px;height:9px;border-radius:50%;background:#60a5fa;flex-shrink:0;display:block"></span>1 г въглехидрат = 4 ккал</div>
+                    <div style="display:flex;gap:8px;align-items:center;font-size:.79rem;color:var(--muted)"><span style="width:9px;height:9px;border-radius:50%;background:#f59e0b;flex-shrink:0;display:block"></span>1 г мазнина = 9 ккал</div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
 @section Scripts {
-<script>
-function calcPreview() {
-  const age = +document.querySelector('[name="Age"]').value;
-  const weight = +document.querySelector('[name="WeightKg"]').value;
-  const height = +document.querySelector('[name="HeightCm"]').value;
-  const gender = document.querySelector('[name="Gender"]').value;
-  const activity = document.querySelector('[name="ActivityLevel"]').value;
-  const goal = document.querySelector('[name="Goal"]').value;
+    <script>
+        // ── PIE CHART via SVG ────────────────────────────────────────────
+        function drawPie(prot, carb, fat) {
+          const total = prot + carb + fat;
+          if (total === 0) return '';
+          const colors = ['#7AB830','#60a5fa','#f59e0b'];
+          const values = [prot, carb, fat];
+          const size = 160, cx = 80, cy = 80, r = 72, gap = 2;
+          let html = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display:block;margin:0 auto">`;
+          let startAngle = -Math.PI / 2;
+          values.forEach((v, i) => {
+            const angle = (v / total) * 2 * Math.PI;
+            const endAngle = startAngle + angle - (gap * Math.PI / 180);
+            const x1 = cx + r * Math.cos(startAngle);
+            const y1 = cy + r * Math.sin(startAngle);
+            const x2 = cx + r * Math.cos(endAngle);
+            const y2 = cy + r * Math.sin(endAngle);
+            const large = angle > Math.PI ? 1 : 0;
+            html += `<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} Z" fill="${colors[i]}" opacity="0.92"/>`;
+            startAngle += angle;
+          });
+          html += '</svg>';
+          return html;
+        }
 
-  if (!age || !weight || !height) return;
+        function renderPreview(cal, protPct, carbPct, fatPct) {
+          const protG = Math.round(cal * protPct / 100 / 4);
+          const carbG = Math.round(cal * carbPct / 100 / 4);
+          const fatG  = Math.round(cal * fatPct  / 100 / 9);
+          document.getElementById('previewContent').innerHTML = `
+            <div style="font-family:'Instrument Serif',serif;font-size:2.2rem;color:#fff;margin-bottom:2px">${cal.toLocaleString('bg')}</div>
+            <div style="font-size:.75rem;opacity:.6;margin-bottom:20px">калории на ден</div>
+            ${drawPie(protPct, carbPct, fatPct)}
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px">
+              <div style="text-align:center">
+                <div style="width:10px;height:10px;border-radius:50%;background:#7AB830;margin:0 auto 5px"></div>
+                <div style="font-size:.75rem;opacity:.65">Протеин</div>
+                <div style="font-size:.95rem;font-weight:700">${protG} г</div>
+                <div style="font-size:.7rem;opacity:.55">${protPct}%</div>
+              </div>
+              <div style="text-align:center">
+                <div style="width:10px;height:10px;border-radius:50%;background:#60a5fa;margin:0 auto 5px"></div>
+                <div style="font-size:.75rem;opacity:.65">Въглехидрати</div>
+                <div style="font-size:.95rem;font-weight:700">${carbG} г</div>
+                <div style="font-size:.7rem;opacity:.55">${carbPct}%</div>
+              </div>
+              <div style="text-align:center">
+                <div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;margin:0 auto 5px"></div>
+                <div style="font-size:.75rem;opacity:.65">Мазнини</div>
+                <div style="font-size:.95rem;font-weight:700">${fatG} г</div>
+                <div style="font-size:.7rem;opacity:.55">${fatPct}%</div>
+              </div>
+            </div>`;
+        }
 
-  let bmr = gender === 'Male'
-    ? 10 * weight + 6.25 * height - 5 * age + 5
-    : 10 * weight + 6.25 * height - 5 * age - 161;
+        // ── CALCULATOR MODE ──────────────────────────────────────────────
+        function calcPreview() {
+          const age    = +document.querySelector('[name="Age"]')?.value;
+          const weight = +document.querySelector('[name="WeightKg"]')?.value;
+          const height = +document.querySelector('[name="HeightCm"]')?.value;
+          const gender = document.querySelector('[name="Gender"]')?.value;
+          const act    = document.querySelector('[name="ActivityLevel"]')?.value;
+          const goal   = document.querySelector('[name="Goal"]')?.value;
+          if (!age || !weight || !height) return;
+          let bmr = gender === 'Male'
+            ? 10*weight + 6.25*height - 5*age + 5
+            : 10*weight + 6.25*height - 5*age - 161;
+          const mult = {Sedentary:1.2,Light:1.375,Moderate:1.55,Active:1.725,VeryActive:1.9};
+          let tdee = bmr * (mult[act] || 1.55);
+          if (goal==='LoseWeight') tdee -= 400;
+          if (goal==='GainMuscle') tdee += 300;
+          const cal = Math.round(tdee);
+          // Standard split: 30% protein, 45% carbs, 25% fat
+          renderPreview(cal, 30, 45, 25);
+        }
 
-  const mult = {Sedentary:1.2,Light:1.375,Moderate:1.55,Active:1.725,VeryActive:1.9};
-  let tdee = bmr * (mult[activity] || 1.55);
-  if (goal === 'LoseWeight') tdee -= 400;
-  if (goal === 'GainMuscle') tdee += 300;
+        // ── MANUAL MODE — SLIDERS ────────────────────────────────────────
+        let sliders = { prot: 30, carb: 45, fat: 25 };
+        const lastChanged = { key: null };
 
-  const cal = Math.round(tdee);
-  const prot = Math.round(weight * 2);
-  const fat = Math.round(tdee * 0.25 / 9);
-  const carbs = Math.max(0, Math.round((tdee - prot * 4 - fat * 9) / 4));
+        function sliderChanged(key) {
+          sliders[key] = +document.getElementById(key+'-slider').value;
+          lastChanged.key = key;
+          enforceSumTo100(key);
+          syncSlidersUI();
+          updateManualPreview();
+        }
 
-  document.getElementById('previewContent').innerHTML = `
-    <div style="margin-bottom:20px">
-      <div style="font-family:'Instrument Serif',serif;font-size:2.5rem;color:#fff">${cal}</div>
-      <div style="font-size:.8rem;opacity:.65;margin-top:2px">калории на ден</div>
-    </div>
-    <div class="macro-bars">
-      <div class="macro-bar-item">
-        <div class="macro-bar-labels"><span>Протеин</span><span>${prot}г</span></div>
-        <div class="macro-bar-track"><div class="macro-bar-fill protein" style="width:${Math.min(100,prot*100/(prot+50))}%"></div></div>
-      </div>
-      <div class="macro-bar-item">
-        <div class="macro-bar-labels"><span>Въглехидрати</span><span>${carbs}г</span></div>
-        <div class="macro-bar-track"><div class="macro-bar-fill carbs" style="width:${Math.min(100,carbs*100/(carbs+80))}%"></div></div>
-      </div>
-      <div class="macro-bar-item">
-        <div class="macro-bar-labels"><span>Мазнини</span><span>${fat}г</span></div>
-        <div class="macro-bar-track"><div class="macro-bar-fill fat" style="width:${Math.min(100,fat*100/(fat+40))}%"></div></div>
-      </div>
-    </div>`;
-}
-// Run on load if data already present
-window.addEventListener('DOMContentLoaded', calcPreview);
-</script>
+        function enforceSumTo100(changed) {
+          const keys = ['prot','carb','fat'];
+          const others = keys.filter(k => k !== changed);
+          let total = sliders.prot + sliders.carb + sliders.fat;
+          let diff = total - 100;
+          if (diff === 0) return;
+          // Distribute diff among the other two proportionally
+          let sumOthers = others.reduce((s,k) => s + sliders[k], 0);
+          if (sumOthers === 0) {
+            others.forEach(k => sliders[k] = Math.max(10, Math.round(100 - sliders[changed]) / 2));
+          } else {
+            others.forEach(k => {
+              sliders[k] = Math.max(10, Math.round(sliders[k] - diff * (sliders[k] / sumOthers)));
+            });
+          }
+          // Correct rounding to exactly 100
+          const newTotal = sliders.prot + sliders.carb + sliders.fat;
+          const adj = 100 - newTotal;
+          if (adj !== 0) {
+            const adjustKey = others.find(k => sliders[k] + adj >= 10) || others[0];
+            sliders[adjustKey] += adj;
+          }
+        }
+
+        function syncSlidersUI() {
+          ['prot','carb','fat'].forEach(k => {
+            document.getElementById(k+'-slider').value = sliders[k];
+            document.getElementById(k+'-pct-lbl').textContent = sliders[k] + '%';
+          });
+          document.getElementById('h-prot').value = sliders.prot;
+          document.getElementById('h-carb').value = sliders.carb;
+          document.getElementById('h-fat').value  = sliders.fat;
+          const total = sliders.prot + sliders.carb + sliders.fat;
+          document.getElementById('pct-total').textContent = total + '%';
+          const bar = document.getElementById('pct-total-bar');
+          const msg = document.getElementById('pct-msg');
+          if (total === 100) {
+            bar.style.background = 'var(--lime-faint)'; bar.style.borderColor = 'rgba(122,184,48,.3)';
+            msg.textContent = 'Идеално!'; msg.style.color = 'var(--lime)';
+            document.getElementById('manual-submit').disabled = false;
+          } else {
+            bar.style.background = '#fee2e2'; bar.style.borderColor = '#fca5a5';
+            msg.textContent = total > 100 ? `с ${total-100}% повече` : `с ${100-total}% по-малко`;
+            msg.style.color = 'var(--danger)';
+            document.getElementById('manual-submit').disabled = true;
+          }
+          updateGrams();
+        }
+
+        function updateGrams() {
+          const cal = +document.getElementById('m-cal')?.value || 0;
+          if (!cal) return;
+          document.getElementById('prot-g-lbl').textContent = Math.round(cal * sliders.prot / 100 / 4) + ' г';
+          document.getElementById('carb-g-lbl').textContent = Math.round(cal * sliders.carb / 100 / 4) + ' г';
+          document.getElementById('fat-g-lbl').textContent  = Math.round(cal * sliders.fat  / 100 / 9) + ' г';
+        }
+
+        function updateManualPreview() {
+          const cal = +document.getElementById('m-cal')?.value || 0;
+          if (cal < 800) {
+            document.getElementById('cal-hint').textContent = cal > 0 ? 'Минимум 800 ккал' : '';
+            document.getElementById('cal-hint').style.color = 'var(--danger)';
+            return;
+          }
+          document.getElementById('cal-hint').textContent = '';
+          syncSlidersUI();
+          renderPreview(cal, sliders.prot, sliders.carb, sliders.fat);
+        }
+
+        function setMode(mode) {
+          const isCalc = mode === 'calc';
+          document.getElementById('mode-calc').style.display = isCalc ? '' : 'none';
+          document.getElementById('mode-manual').style.display = isCalc ? 'none' : '';
+          document.getElementById('btn-calc').className = 'btn btn-sm' + (isCalc ? ' btn-primary' : ' btn-ghost');
+          document.getElementById('btn-manual').className = 'btn btn-sm' + (!isCalc ? ' btn-primary' : ' btn-ghost');
+          ['btn-calc','btn-manual'].forEach(id => document.getElementById(id).style.borderRadius = '50px');
+          if (!isCalc) { syncSlidersUI(); updateManualPreview(); }
+          else calcPreview();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+          syncSlidersUI();
+          calcPreview();
+        });
+    </script>
 }
