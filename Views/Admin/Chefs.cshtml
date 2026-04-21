@@ -10,7 +10,7 @@
   </div>
   <div class="dash-content">
     <div class="card" style="padding:0;overflow:hidden">
-      <table class="orders-table">
+        <table class="tbl chefs-table">
         <thead><tr><th>Готвач</th><th>Специалност</th><th>Опит</th><th>Рейтинг</th><th>Статус</th><th>Действия</th></tr></thead>
         <tbody>
         @foreach (var c in Model)
@@ -20,14 +20,18 @@
               <div style="font-weight:600">@c.User?.FullName</div>
               <div style="font-size:.78rem;color:var(--muted)">@c.User?.Email</div>
             </td>
-            <td>@c.Specialties</td>
+            <td>
+                <div style="max-width:260px">
+                    @c.Specialties
+                </div>
+            </td>
             <td>@c.ExperienceYears год.</td>
             <td>★ @c.Rating.ToString("0.0") (@c.TotalReviews)</td>
             <td>
               @if (c.IsVerified)
-              { <span class="badge" style="background:var(--lime-faint);color:var(--dark)">✓ Верифициран</span> }
+              { <span class="badge" style="background:var(--lime-faint);color:var(--dark)">Верифициран</span> }
               else
-              { <span class="badge" style="background:#fef3c7;color:#92400e">⏳ Чака</span> }
+              { <span class="badge" style="background:#fef3c7;color:#92400e">Чака</span> }
             </td>
             <td>
               <form asp-action="VerifyChef" method="post" style="display:inline">
@@ -35,7 +39,7 @@
                 <input type="hidden" name="id" value="@c.Id">
                 <input type="hidden" name="verified" value="@(!c.IsVerified)">
                 <button type="submit" class="btn btn-sm @(c.IsVerified ? "btn-danger" : "btn-primary")">
-                  @(c.IsVerified ? "Премахни верификацията" : "✓ Верифицирай")
+                  @(c.IsVerified ? "Премахни верификацията" : "Верифицирай")
                 </button>
               </form>
             </td>
@@ -46,3 +50,60 @@
     </div>
   </div>
 </div>
+
+
+<style>
+    .chefs-table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+        .chefs-table th,
+        .chefs-table td {
+            padding: 16px 18px;
+            vertical-align: middle;
+        }
+
+            /* ширини на колоните */
+            .chefs-table th:nth-child(1),
+            .chefs-table td:nth-child(1) {
+                width: 25%;
+            }
+
+            .chefs-table th:nth-child(2),
+            .chefs-table td:nth-child(2) {
+                width: 25%;
+            }
+
+            .chefs-table th:nth-child(3),
+            .chefs-table td:nth-child(3) {
+                width: 10%;
+            }
+
+            .chefs-table th:nth-child(4),
+            .chefs-table td:nth-child(4) {
+                width: 15%;
+            }
+
+            .chefs-table th:nth-child(5),
+            .chefs-table td:nth-child(5) {
+                width: 10%;
+            }
+
+            .chefs-table th:nth-child(6),
+            .chefs-table td:nth-child(6) {
+                width: 15%;
+            }
+
+        /* това оправя "смачкването" */
+        .chefs-table td {
+            word-wrap: break-word;
+            white-space: normal;
+        }
+
+            /* специално за специалностите */
+            .chefs-table td:nth-child(2) {
+                line-height: 1.4;
+                color: var(--muted);
+            }
+</style>

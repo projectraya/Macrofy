@@ -8,7 +8,7 @@
 
         @foreach (var ev in Model)
         {
-            var spots = ev.Registrations.Count(r => r.Status != Macrofy.Models.Enum.RegistrationStatus.Rejected);
+            var spots = ev.ConfirmedSpots;
             var spotsLeft = ev.MaxSpots - spots;
             var isRegistered = User.Identity?.IsAuthenticated == true &&
             ev.Registrations.Any(r => r.UserId == (User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value));
@@ -84,8 +84,8 @@
                         <div style="width:60px;height:60px;background:var(--lime-faint);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;border:2px solid var(--lime)">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--lime-dark)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12" /></svg>
                         </div>
-                        <h3 style="color:var(--teal);margin-bottom:6px">Вече си записан!</h3>
-                        <p style="color:var(--muted);font-size:.9rem;font-weight:500">Ще получиш потвърждение на имейла си. Очакваме те!</p>
+                        <h3 style="color:var(--teal);margin-bottom:6px">Успешно кандидатства!</h3>
+                        <p style="color:var(--muted);font-size:.9rem;font-weight:500">Ще получиш потвърждение на имейла си, ако бъдеш избран.</p>
                     </div>
                 }
                 else if (spotsLeft <= 0)
@@ -97,12 +97,12 @@
                 }
                 else
                 {
-                    <h3 style="color:var(--teal);margin-bottom:6px;font-size:1.1rem;font-weight:800">Запиши се за събитието</h3>
-                    <p style="color:var(--muted);font-size:.86rem;margin-bottom:20px;font-weight:500">Безплатно. Само <strong style="color:var(--teal)">@spotsLeft места</strong> оставащи.</p>
+                    <h3 style="color:var(--teal);margin-bottom:6px;font-size:1.1rem;font-weight:800">Кандидатствай за събитието</h3>
+                    <p style="color:var(--muted);font-size:.86rem;margin-bottom:20px;font-weight:500">Безплатно. Ако бъдеш избран ще получиш имейл от нас за локацията и времето на провеждане. Само <strong style="color:var(--teal)">@spotsLeft места</strong> оставащи.</p>
 
                     @if (User.Identity?.IsAuthenticated != true)
                     {
-                        <p style="font-size:.9rem;color:var(--muted);margin-bottom:16px;font-weight:500">Трябва да влезеш в профила си, за да се запишеш.</p>
+                        <p style="font-size:.9rem;color:var(--muted);margin-bottom:16px;font-weight:500">Трябва да влезеш в профила си, за да кандидатстваш.</p>
                         <div style="display:flex;gap:10px">
                             <a asp-controller="Account" asp-action="Login" class="btn btn-primary">Вход</a>
                             <a asp-controller="Account" asp-action="Register" class="btn btn-secondary">Регистрация</a>

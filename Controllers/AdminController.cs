@@ -153,4 +153,23 @@ public class AdminController : Controller
 		TempData["Success"] = "Статусът е обновен.";
 		return RedirectToAction("Events");
 	}
+
+	[HttpPost]
+	[ValidateAntiForgeryToken]
+	public async Task<IActionResult> UpdateEventSpots(int eventId, int confirmedSpots)
+	{
+		var ev = await _db.Events.FindAsync(eventId);
+		if (ev == null) return NotFound();
+
+		if (confirmedSpots < 0 || confirmedSpots > ev.MaxSpots)
+		{
+			TempData["Error"] = $"Невалиден брой места. Максимумът е {ev.MaxSpots}.";
+			return RedirectToAction("Events");
+		}
+
+		ev.ConfirmedSpots = confirmedSpots;
+		await _db.SaveChangesAsync();
+		TempData["Success"] = $"Потвърдените места са обновени на {confirmedSpots} / {ev.MaxSpots}.";
+		return RedirectToAction("Events");
+	}
 }

@@ -9,7 +9,7 @@
   </div>
   <div class="dash-content">
     <div class="card" style="padding:0;overflow:hidden">
-      <table class="orders-table">
+        <table class="tbl orders-admin-table">
         <thead><tr><th>ID</th><th>Клиент</th><th>Готвач</th><th>Период</th><th>Статус</th><th>Цена</th><th>Дата</th></tr></thead>
         <tbody>
         @foreach (var o in Model)
@@ -18,7 +18,13 @@
             <td><strong>#@o.Id</strong></td>
             <td>@o.ClientName</td>
             <td>@o.ChefName</td>
-            <td style="font-size:.82rem">@o.StartDate.ToString("dd.MM") – @o.EndDate.ToString("dd.MM.yy")</td>
+            <td>
+                <span style="white-space:nowrap">
+                       @o.StartDate.ToString("dd.MM")
+                        –
+                        @o.EndDate.ToString("dd.MM.yy")
+                </span>
+            </td>
             <td><span class="badge badge-@o.Status">@o.Status</span></td>
             <td>@o.TotalPrice.ToString("F0") лв</td>
             <td style="font-size:.82rem;color:var(--muted)">@o.CreatedAt.ToString("dd.MM.yy")</td>
@@ -29,3 +35,74 @@
     </div>
   </div>
 </div>
+
+
+<style>
+    .orders-admin-table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+        .orders-admin-table th,
+        .orders-admin-table td {
+            padding: 16px 18px;
+            vertical-align: middle;
+        }
+
+            .orders-admin-table th:nth-child(1),
+            .orders-admin-table td:nth-child(1) {
+                width: 8%;
+            }
+
+            .orders-admin-table th:nth-child(2),
+            .orders-admin-table td:nth-child(2) {
+                width: 18%;
+            }
+
+            .orders-admin-table th:nth-child(3),
+            .orders-admin-table td:nth-child(3) {
+                width: 18%;
+            }
+
+            .orders-admin-table th:nth-child(4),
+            .orders-admin-table td:nth-child(4) {
+                width: 18%;
+            }
+
+            .orders-admin-table th:nth-child(5),
+            .orders-admin-table td:nth-child(5) {
+                width: 14%;
+            }
+
+            .orders-admin-table th:nth-child(6),
+            .orders-admin-table td:nth-child(6) {
+                width: 12%;
+            }
+
+            .orders-admin-table th:nth-child(7),
+            .orders-admin-table td:nth-child(7) {
+                width: 12%;
+            }
+
+        .orders-admin-table td {
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+            .orders-admin-table td:nth-child(1) {
+                font-weight: 800;
+                color: var(--teal);
+            }
+
+            .orders-admin-table td:nth-child(4) {
+                font-size: .82rem;
+            }
+
+            .orders-admin-table td:nth-child(6) {
+                font-weight: 700;
+            }
+
+            .orders-admin-table td:nth-child(7) {
+                color: var(--muted);
+            }
+</style>

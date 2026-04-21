@@ -32,6 +32,7 @@ public class ApplicationUser : IdentityUser
 	public string? FavFats { get; set; }
 	public string? FavDesserts { get; set; }
 	public string? CheatMeal { get; set; }
+	public string? DietaryNotes { get; set; }
 
 	// Navigation
 	public ChefProfile? ChefProfile { get; set; }

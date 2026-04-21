@@ -121,7 +121,7 @@ h1, h2, h3, h4 {
 }
 
 .nav-brand img {
-    height: 36px;
+    height: 64px;
 }
 
 .nav-links {
@@ -1110,7 +1110,6 @@ h1, h2, h3, h4 {
     .auth-left .logo-white {
         height: 40px;
         margin-bottom: 44px;
-        filter: brightness(10);
         position: relative;
     }
 

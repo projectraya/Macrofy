@@ -26,63 +26,36 @@ public class EventController : Controller
 		return View(events);
 	}
 
-	[HttpGet]
+	[HttpPost]
 	[Authorize(Roles = "Client")]
-	public async Task<IActionResult> Register(int id)
+	[ValidateAntiForgeryToken]
+	public async Task<IActionResult> Register(int id, string contactEmail, string? contactPhone)
 	{
 		var ev = await _db.Events
 			.Include(e => e.Registrations)
-			.FirstOrDefaultAsync(e => e.Id == id);
+			.FirstOrDefaultAsync(e => e.Id == id && e.IsActive);
+
 		if (ev == null) return NotFound();
 
 		var user = await _userManager.GetUserAsync(User);
 		if (user == null) return RedirectToAction("Login", "Account");
 
-		// Already registered?
+		// Already applied?
 		if (ev.Registrations.Any(r => r.UserId == user.Id))
 		{
-			TempData["Error"] = "Вече си записан за това събитие.";
-			return RedirectToAction("Index");
-		}
-
-		// Full?
-		var confirmed = ev.Registrations.Count(r => r.Status != RegistrationStatus.Rejected);
-		if (confirmed >= ev.MaxSpots)
-		{
-			TempData["Error"] = "За съжаление местата са изчерпани.";
+			TempData["Error"] = "Вече си кандидатствал за това събитие.";
 			return RedirectToAction("Index");
 		}
 
 		// No macro profile?
 		if (!user.DailyCalories.HasValue)
 		{
-			TempData["Error"] = "Трябва да попълниш макро профила си преди да се запишеш за събитие.";
-			return RedirectToAction("MacroProfile", "Dashboard", new { returnUrl = Url.Action("Register", "Event", new { id }) });
+			TempData["Error"] = "Трябва да попълниш макро профила си преди да кандидатстваш.";
+			return RedirectToAction("MacroProfile", "Dashboard",
+				new { returnUrl = Url.Action("Index", "Event") });
 		}
 
-		ViewBag.Event = ev;
-		ViewBag.User = user;
-		return View();
-	}
-
-	[HttpPost]
-	[Authorize(Roles = "Client")]
-	[ValidateAntiForgeryToken]
-	public async Task<IActionResult> Register(int id, string contactEmail, string? contactPhone)
-	{
-		var ev = await _db.Events.Include(e => e.Registrations).FirstOrDefaultAsync(e => e.Id == id);
-		if (ev == null) return NotFound();
-
-		var user = await _userManager.GetUserAsync(User);
-		if (user == null) return RedirectToAction("Login", "Account");
-
-		if (ev.Registrations.Any(r => r.UserId == user.Id))
-		{ TempData["Error"] = "Вече си записан."; return RedirectToAction("Index"); }
-
-		var confirmed = ev.Registrations.Count(r => r.Status != RegistrationStatus.Rejected);
-		if (confirmed >= ev.MaxSpots)
-		{ TempData["Error"] = "Местата са изчерпани."; return RedirectToAction("Index"); }
-
+		// Add application — status is always Pending, admin decides
 		_db.EventRegistrations.Add(new EventRegistration
 		{
 			EventId = id,
@@ -93,7 +66,7 @@ public class EventController : Controller
 		});
 		await _db.SaveChangesAsync();
 
-		TempData["Success"] = "Записан си успешно! Ще получиш потвърждение скоро.";
+		TempData["Success"] = "Кандидатурата ти е получена! Ще се свържем с теб ако бъдеш избран.";
 		return RedirectToAction("Index");
 	}
 }

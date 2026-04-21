@@ -8,6 +8,8 @@
 		public string Location { get; set; } = string.Empty;
 		public DateTime EventDate { get; set; }
 		public int MaxSpots { get; set; } = 10;
+
+		public int ConfirmedSpots { get; set; } = 0;
 		public bool IsActive { get; set; } = true;
 		public string? ImageUrl { get; set; }
 		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

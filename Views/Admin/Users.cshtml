@@ -9,7 +9,7 @@
   </div>
   <div class="dash-content">
     <div class="card" style="padding:0;overflow:hidden">
-      <table class="orders-table">
+        <table class="tbl users-table">
         <thead><tr><th>Потребител</th><th>Роля</th><th>Макро профил</th><th>Регистриран</th></tr></thead>
         <tbody>
         @foreach (var u in Model)
@@ -21,10 +21,21 @@
             </td>
             <td>
               <span class="badge @(u.Role == Macrofy.Models.UserRole.Admin ? "badge-Confirmed" : u.Role == Macrofy.Models.UserRole.Chef ? "badge-Preparing" : "badge-Delivered")">
-                @(u.Role == Macrofy.Models.UserRole.Admin ? "🔧 Admin" : u.Role == Macrofy.Models.UserRole.Chef ? "👨‍🍳 Готвач" : "👤 Клиент")
+                @(u.Role == Macrofy.Models.UserRole.Admin ? "Admin" : u.Role == Macrofy.Models.UserRole.Chef ? "Готвач" : "Клиент")
               </span>
             </td>
-            <td>@(u.DailyCalories.HasValue ? $"✓ {u.DailyCalories} ккал" : "–")</td>
+             <td>
+                 @if (u.DailyCalories.HasValue)
+                 {
+                     <span style="color:var(--lime-dark);font-weight:700">
+                         ✓ @u.DailyCalories kcal
+                     </span>
+                 }
+                 else
+                 {
+                     <span style="color:var(--muted)">–</span>
+                 }
+             </td>
             <td style="font-size:.82rem;color:var(--muted)">@u.CreatedAt.ToString("dd.MM.yyyy")</td>
           </tr>
         }
@@ -33,3 +44,53 @@
     </div>
   </div>
 </div>
+
+<style>
+    .users-table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+        .users-table th,
+        .users-table td {
+            padding: 16px 18px;
+            vertical-align: middle;
+        }
+
+            /* ширини */
+            .users-table th:nth-child(1),
+            .users-table td:nth-child(1) {
+                width: 40%;
+            }
+
+            .users-table th:nth-child(2),
+            .users-table td:nth-child(2) {
+                width: 20%;
+            }
+
+            .users-table th:nth-child(3),
+            .users-table td:nth-child(3) {
+                width: 20%;
+            }
+
+            .users-table th:nth-child(4),
+            .users-table td:nth-child(4) {
+                width: 20%;
+            }
+
+        /* FIX за смачкване */
+        .users-table td {
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+            /* малко polish */
+            .users-table td:nth-child(1) {
+                line-height: 1.4;
+            }
+
+            .users-table td:nth-child(3) {
+                font-weight: 600;
+                color: var(--teal);
+            }
+</style>
