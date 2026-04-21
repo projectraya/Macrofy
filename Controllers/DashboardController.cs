@@ -128,7 +128,9 @@ public class DashboardController : Controller
 			ActivityLevel = user.ActivityLevel ?? Models.ActivityLevel.Moderate,
 			Goal = user.Goal ?? Models.FitnessGoal.Maintain,
 			DietaryPreference = user.DietaryPreference ?? Models.DietaryPreference.Standard,
-			Allergies = user.AllergyList
+
+			HasAllergies = !string.IsNullOrEmpty(user.AllergyList),
+			AllergyList = user.AllergyList
 		};
 		return View(vm);
 	}
@@ -145,9 +147,15 @@ public class DashboardController : Controller
 		user.Age = vm.Age; user.WeightKg = vm.WeightKg; user.HeightCm = vm.HeightCm;
 		user.Gender = vm.Gender; user.ActivityLevel = vm.ActivityLevel; user.Goal = vm.Goal;
 		user.DietaryPreference = vm.DietaryPreference;
-		user.AllergyList = vm.Allergies;
+		user.AllergyList = vm.HasAllergies ? vm.AllergyList : null;
 		user.DailyCalories = result.Calories; user.DailyProtein = result.Protein;
 		user.DailyCarbs = result.Carbs; user.DailyFat = result.Fat;
+
+		if (vm.HasAllergies && string.IsNullOrWhiteSpace(vm.AllergyList))
+		{
+			ModelState.AddModelError("AllergyList", "Моля опиши алергиите си.");
+			return View(vm);
+		}
 
 		await _userManager.UpdateAsync(user);
 		TempData["Success"] = "Макро профилът е обновен!";
@@ -163,7 +171,8 @@ public class DashboardController : Controller
 	int ManualCalories,
 	int ManualProteinPct, int ManualCarbsPct, int ManualFatPct,
 	string ManualDiet = "Standard",
-	string? ManualAllergies = null)
+	string? ManualAllergies = null,
+	bool HasAllergies = false)
 	{
 		var user = await _userManager.GetUserAsync(User);
 		if (user == null) return RedirectToAction("Login", "Account");
@@ -183,7 +192,9 @@ public class DashboardController : Controller
 
 		if (Enum.TryParse<DietaryPreference>(ManualDiet, out var diet))
 			user.DietaryPreference = diet;
-		user.AllergyList = ManualAllergies;
+		user.AllergyList = HasAllergies
+	? ManualAllergies
+	: null;
 
 		await _userManager.UpdateAsync(user);
 		TempData["Success"] = "Макросите са запазени!";

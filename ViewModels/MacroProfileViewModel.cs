@@ -32,7 +32,17 @@ namespace Macrofy.ViewModels
 		[Display(Name = "Диетични предпочитания")]
 		public DietaryPreference DietaryPreference { get; set; }
 
-		[Display(Name = "Алергии или специфики")]
-		public string? Allergies { get; set; }
+		[Display(Name = "Има ли алергии")]
+		public bool HasAllergies { get; set; }
+
+		[Display(Name = "Алергии")]
+		public string? AllergyList { get; set; }
+
+		public string? FavProteins { get; set; }
+		public string? FavCarbs { get; set; }
+		public string? FavFats { get; set; }
+		public string? FavDesserts { get; set; }
+
+		public string? DietaryNotes { get; set; }
 	}
 }

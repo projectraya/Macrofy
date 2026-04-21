@@ -25,6 +25,7 @@ public class ApplicationUser : IdentityUser
 	// Allergies — stored as comma-separated string of enum values
 	public string? AllergyList { get; set; }
 	public bool NoAllergies { get; set; } = false;
+	public bool HasAllergies { get; set; }
 
 	// Food preferences — comma-separated
 	public string? FavProteins { get; set; }

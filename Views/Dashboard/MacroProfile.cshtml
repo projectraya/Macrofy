@@ -28,6 +28,7 @@
                     <div asp-validation-summary="ModelOnly" class="val-summary"></div>
                     <form asp-action="MacroProfile" method="post">
                         @Html.AntiForgeryToken()
+                        <input type ="hidden" name="NoAllergies" value="false">
                         <input type="hidden" name="InputMode" value="Calculate">
                         <div class="form-row">
                             <div class="fg"><label asp-for="Age">Възраст</label><input asp-for="Age" type="number" placeholder="25" min="15" max="80" oninput="calcPreview()"><span asp-validation-for="Age" class="fv-error"></span></div>
@@ -74,8 +75,52 @@
                             </select>
                         </div>
                         <div class="fg">
-                            <label asp-for="Allergies">Алергии или специфики</label>
-                            <textarea asp-for="Allergies" placeholder="Напр. алергия към ядки, без свинско месо..."></textarea>
+                            <label>Имаш ли алергии?</label>
+
+                            <div style="display:flex;gap:10px;margin-bottom:8px">
+                                <label style="display:flex;align-items:center;gap:6px">
+                                    <input type="radio" name="NoAllergies" value="false" checked onchange="toggleAllergyBox(true)">
+                                    Да, имам
+                                </label>
+
+                                <label style="display:flex;align-items:center;gap:6px">
+                                    <input type="radio" name="NoAllergies" value="true" onchange="toggleAllergyBox(false)">
+                                    Не, нямам
+                                </label>
+                            </div>
+
+                            <textarea asp-for="AllergyList"
+                                      id="allergyBox"
+                                      placeholder="Опиши алергиите си (напр. ядки, млечни, яйца...)"
+                                      style="display:block"></textarea>
+
+                            <span id="allergyError" style="font-size:.75rem;color:#ef4444;display:none;margin-top:4px">
+                                Моля, опиши алергиите си
+                            </span>
+                        </div>
+                        <div class="fg">
+                            <label>Любими протеини</label>
+                            <input type="text" name="FavProteins" placeholder="пилешко, телешко, риба...">
+                        </div>
+
+                        <div class="fg">
+                            <label>Любими въглехидрати</label>
+                            <input type="text" name="FavCarbs" placeholder="ориз, картофи, овес...">
+                        </div>
+
+                        <div class="fg">
+                            <label>Любими мазнини</label>
+                            <input type="text" name="FavFats" placeholder="авокадо, зехтин, ядки...">
+                        </div>
+
+                        <div class="fg">
+                            <label>Любими десерти</label>
+                            <input type="text" name="FavDesserts" placeholder="шоколад, протеинови барове...">
+                        </div>
+                        <div class="fg">
+                            <label>Хранителни бележки</label>
+                            <textarea name="DietaryNotes"
+                                      placeholder="Пример: не ям пържено, избягвам захар, предпочитам домашна храна..."></textarea>
                         </div>
                         <button type="submit" class="form-submit">Запази профила</button>
                     </form>
@@ -89,6 +134,7 @@
                     <p style="font-size:.82rem;color:var(--muted);margin-bottom:18px">Разпредели макросите в проценти. Сборът трябва да е точно 100%.</p>
                     <form asp-action="MacroProfileManual" method="post" id="manualForm">
                         @Html.AntiForgeryToken()
+                        <input type="hidden" name="NoAllergies" value="false">
                         <div class="fg">
                             <label>Дневни калории (ккал)</label>
                             <input type="number" name="ManualCalories" id="m-cal" placeholder="2000" min="800" max="6000" required oninput="updateManualPreview()">
@@ -145,8 +191,52 @@
                             </div>
                         </div>
                         <div class="fg">
-                            <label>Алергии или специфики</label>
-                            <textarea name="ManualAllergies" placeholder="Напр. алергия към ядки..."></textarea>
+                            <label>Имаш ли алергии?</label>
+
+                            <div style="display:flex;gap:10px;margin-bottom:8px">
+                                <label style="display:flex;align-items:center;gap:6px">
+                                    <input type="radio" name="NoAllergies" value="false" checked onchange="toggleAllergyBox(true)">
+                                    Да, имам
+                                </label>
+
+                                <label style="display:flex;align-items:center;gap:6px">
+                                    <input type="radio" name="NoAllergies" value="true" onchange="toggleAllergyBox(false)">
+                                    Не, нямам
+                                </label>
+                            </div>
+
+                            <textarea asp-for="AllergyList"
+                                      id="allergyBox"
+                                      placeholder="Опиши алергиите си (напр. ядки, млечни, яйца...)"
+                                      style="display:block"></textarea>
+
+                            <span id="allergyError" style="font-size:.75rem;color:#ef4444;display:none;margin-top:4px">
+                                Моля, опиши алергиите си
+                            </span>
+                        </div>
+                        <div class="fg">
+                            <label>Любими протеини</label>
+                            <input type="text" name="FavProteins" placeholder="пилешко, телешко, риба...">
+                        </div>
+
+                        <div class="fg">
+                            <label>Любими въглехидрати</label>
+                            <input type="text" name="FavCarbs" placeholder="ориз, картофи, овес...">
+                        </div>
+
+                        <div class="fg">
+                            <label>Любими мазнини</label>
+                            <input type="text" name="FavFats" placeholder="авокадо, зехтин, ядки...">
+                        </div>
+
+                        <div class="fg">
+                            <label>Любими десерти</label>
+                            <input type="text" name="FavDesserts" placeholder="шоколад, протеинови барове...">
+                        </div>
+                        <div class="fg">
+                            <label>Хранителни бележки</label>
+                            <textarea name="DietaryNotes"
+                                      placeholder="Пример: не ям пържено, избягвам захар, предпочитам домашна храна..."></textarea>
                         </div>
                         <button type="submit" id="manual-submit" class="form-submit">Запази макросите</button>
                     </form>
@@ -174,6 +264,18 @@
         </div>
     </div>
 </div>
+
+<style>
+    input[type="text"], textarea {
+        transition: 0.2s ease;
+    }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--lime);
+            box-shadow: 0 0 0 2px rgba(122,184,48,.15);
+        }
+</style>
 
 @section Scripts {
     <script>
@@ -344,9 +446,52 @@
           else calcPreview();
         }
 
+
+                function toggleAllergyBox(show) {
+            const box = document.getElementById('allergyBox');
+            const err = document.getElementById('allergyError');
+
+            if (show) {
+                box.style.display = '';
+                box.required = true;
+            } else {
+                box.style.display = 'none';
+                box.required = false;
+                box.value = '';
+                err.style.display = 'none';
+            }
+        }
+
+        document.querySelector('form')?.addEventListener('submit', function (e) {
+            const hasAllergy = document.querySelector('input[name="NoAllergies"]:checked')?.value === "false";
+            const box = document.getElementById('allergyBox');
+
+            if (hasAllergy && !box.value.trim()) {
+                e.preventDefault();
+                document.getElementById('allergyError').style.display = 'block';
+            }
+        });
+
+
+                function toggleManualAllergy(show) {
+            const box = document.getElementById('manualAllergyBox');
+
+            if (show) {
+                box.style.display = '';
+                box.required = true;
+            } else {
+                box.style.display = 'none';
+                box.value = '';
+                box.required = false;
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
           syncSlidersUI();
           calcPreview();
         });
+
+
+
     </script>
 }
