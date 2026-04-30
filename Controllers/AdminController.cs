@@ -144,6 +144,92 @@ public class AdminController : Controller
 
 	[HttpPost]
 	[ValidateAntiForgeryToken]
+	public async Task<IActionResult> ToggleEventBadge(int id)
+	{
+		var chef = await _db.ChefProfiles.FindAsync(id);
+		if (chef == null) return NotFound();
+
+		chef.HasEventBadge = !chef.HasEventBadge;
+		if (chef.HasEventBadge)
+			chef.EventBadgeLabel = "Macrofy Demo Вечер";
+		else
+			chef.EventBadgeLabel = null;
+
+		await _db.SaveChangesAsync();
+		TempData["Success"] = chef.HasEventBadge
+			? "Event баджът е добавен."
+			: "Event баджът е премахнат.";
+		return RedirectToAction("Chefs");
+	}
+
+	public IActionResult CreateEvent()
+	{
+		return View();
+	}
+
+	[HttpPost]
+	[ValidateAntiForgeryToken]
+	public async Task<IActionResult> CreateEvent(Event model)
+	{
+		if (!ModelState.IsValid) return View(model);
+
+		model.EventDate = DateTime.SpecifyKind(model.EventDate, DateTimeKind.Utc);
+		_db.Events.Add(model);
+		await _db.SaveChangesAsync();
+
+		TempData["Success"] = "Събитието е създадено.";
+		return RedirectToAction("Events");
+	}
+
+	public async Task<IActionResult> EditEvent(int id)
+	{
+		var ev = await _db.Events.FindAsync(id);
+		if (ev == null) return NotFound();
+
+		return View(ev);
+	}
+
+	[HttpPost]
+	[ValidateAntiForgeryToken]
+	public async Task<IActionResult> EditEvent(Event model)
+	{
+		if (!ModelState.IsValid) return View(model);
+
+		var ev = await _db.Events.FindAsync(model.Id);
+		if (ev == null) return NotFound();
+
+		ev.Title = model.Title;
+		ev.Description = model.Description;
+		ev.Location = model.Location;
+
+		ev.EventDate = DateTime.SpecifyKind(model.EventDate, DateTimeKind.Utc);
+
+		ev.MaxSpots = model.MaxSpots;
+		ev.IsActive = model.IsActive;
+		ev.ImageUrl = model.ImageUrl;
+
+		await _db.SaveChangesAsync();
+
+		TempData["Success"] = "Събитието е обновено.";
+		return RedirectToAction("Events");
+	}
+
+	[HttpPost]
+	[ValidateAntiForgeryToken]
+	public async Task<IActionResult> DeleteEvent(int id)
+	{
+		var ev = await _db.Events.FindAsync(id);
+		if (ev == null) return NotFound();
+
+		_db.Events.Remove(ev);
+		await _db.SaveChangesAsync();
+
+		TempData["Success"] = "Събитието е изтрито.";
+		return RedirectToAction("Events");
+	}
+
+	[HttpPost]
+	[ValidateAntiForgeryToken]
 	public async Task<IActionResult> UpdateRegistration(int id, Macrofy.Models.Enum.RegistrationStatus status)
 	{
 		var reg = await _db.EventRegistrations.FindAsync(id);

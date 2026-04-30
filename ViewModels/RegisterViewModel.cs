@@ -13,7 +13,7 @@ namespace Macrofy.ViewModels
 		[Display(Name = "Имейл")]
 		public string Email { get; set; } = string.Empty;
 
-		[Required, MinLength(6, ErrorMessage = "Минимум 6 символа")]
+		[Required]
 		[DataType(DataType.Password)]
 		[Display(Name = "Парола")]
 		public string Password { get; set; } = string.Empty;

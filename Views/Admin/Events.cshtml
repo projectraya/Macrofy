@@ -88,54 +88,72 @@
 
 <div class="dash-page">
     <div class="dash-header">
-        <div style="max-width:1200px;margin:0 auto">
-            <h1>Управление на събития</h1>
-            <p>Преглед на кандидатурите и ръчно управление на потвърдените места.</p>
+        <div style="max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:flex-end; gap:20px">
+            <div>
+                <h1>Управление на събития</h1>
+                <p>Преглед на кандидатурите и ръчно управление на потвърдените места.</p>
+            </div>
+            <!-- Бутонът Добави събитие вляво под заглавието -->
+            <div style="padding-bottom: 5px;">
+                <a asp-action="CreateEvent" class="btn btn-primary">
+                    <span style="margin-right:5px">+</span> Добави събитие
+                </a>
+            </div>
         </div>
     </div>
-    <div class="dash-content">
 
+    <div class="dash-content">
         @foreach (var ev in Model)
         {
-            <div class="card" style="margin-bottom:28px">
+            <div class="card" style="margin-bottom:28px; position:relative">
 
-                <!-- Event header + spots editor -->
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border)">
-                    <div>
-                        <h2 style="color:var(--teal);font-size:1.15rem;margin-bottom:5px">@ev.Title</h2>
-                        <div style="font-size:.84rem;color:var(--muted);font-weight:600">
+                
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:24px; margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid var(--border)">
+                    <div style="flex:1; min-width:300px">
+                        <h2 style="color:var(--teal); font-size:1.3rem; margin-bottom:8px; padding-right:150px">@ev.Title</h2>
+                        <div style="font-size:.84rem; color:var(--muted); font-weight:600; margin-bottom:12px">
                             @ev.EventDate.ToString("dd.MM.yyyy HH:mm") &nbsp;·&nbsp; @ev.Location
                         </div>
-                        <div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap">
-                            <span class="badge" style="background:var(--lime-faint);color:var(--teal);font-size:.78rem">
+                        <!-- Редактирай / Изтрий - Изнесени тук, за да не пречат -->
+                        <div style="display:flex; gap:8px; flex-shrink:0">
+                            <a asp-action="EditEvent" asp-route-id="@ev.Id" class="btn btn-sm btn-secondary" style="font-size:0.75rem; padding:6px 12px; border:1px solid var(--border)">Редактирай</a>
+
+                            <form asp-action="DeleteEvent" method="post" onsubmit="return confirm('Сигурен ли си?')" style="margin:0">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@ev.Id" />
+                                <button type="submit" class="btn btn-sm btn-danger" style="font-size:0.75rem; padding:6px 12px">Изтрий</button>
+                            </form>
+                        </div>
+                        <br />
+                        <div style="display:flex; gap:10px; flex-wrap:wrap">
+                            <span class="badge" style="background:var(--lime-faint); color:var(--teal); border:1px solid rgba(141,198,63,0.2)">
                                 @ev.Registrations.Count кандидатури
                             </span>
-                            <span class="badge" style="background:var(--teal-light);color:var(--teal);font-size:.78rem">
+                            <span class="badge" style="background:var(--teal-light); color:var(--teal)">
                                 @ev.ConfirmedSpots / @ev.MaxSpots потвърдени
-                            </span>
-                            <span class="badge" style="background:@(ev.MaxSpots - ev.ConfirmedSpots > 0 ? "#d1fae5" : "#fee2e2");color:@(ev.MaxSpots - ev.ConfirmedSpots > 0 ? "#065f46" : "#991b1b");font-size:.78rem">
-                                @(ev.MaxSpots - ev.ConfirmedSpots > 0 ? $"{ev.MaxSpots - ev.ConfirmedSpots} свободни" : "Изчерпани")
                             </span>
                         </div>
                     </div>
 
-                    <!-- Spots updater -->
-                    <div style="background:var(--bg);border-radius:var(--r);padding:16px 20px;border:1px solid var(--border);min-width:260px">
-                        <div style="font-size:.75rem;font-weight:900;color:var(--teal);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">
-                            Обнови потвърдените места
+                    <!-- По-подредена форма за местата -->
+                    <div style="background:var(--bg); border-radius:var(--r); padding:20px; border:1px solid var(--border); width:280px">
+                        <div style="font-size:.7rem; font-weight:900; color:var(--teal); text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px">
+                            Места за събитието
                         </div>
-                        <form asp-action="UpdateEventSpots" method="post" style="display:flex;gap:8px;align-items:center">
+
+                        <form asp-action="UpdateEventSpots" method="post" style="display:flex; flex-direction:column; gap:10px">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="eventId" value="@ev.Id">
-                            <div style="display:flex;align-items:center;gap:8px;flex:1">
+
+                            <div style="display:flex; align-items:center; gap:10px; background:#fff; padding:6px 12px; border-radius:8px; border:1px solid var(--border)">
                                 <input type="number" name="confirmedSpots"
                                        value="@ev.ConfirmedSpots"
                                        min="0" max="@ev.MaxSpots"
-                                       style="width:70px;padding:8px 10px;border:2px solid var(--border);border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:700;font-size:.9rem;text-align:center"
-                                       oninput="this.style.borderColor=+this.value<=@ev.MaxSpots?'var(--teal)':'var(--danger)'">
-                                <span style="font-size:.84rem;color:var(--muted);font-weight:600">/ @ev.MaxSpots</span>
+                                       style="width:60px; border:none; font-weight:800; font-size:1.1rem; color:var(--teal); outline:none; text-align:center">
+                                <span style="color:var(--muted); font-size:0.9rem; font-weight:600">/ @ev.MaxSpots потвърдени</span>
                             </div>
-                            <button type="submit" class="btn btn-primary btn-sm">Запази</button>
+
+                            <button type="submit" class="btn btn-primary btn-sm" style="width:100%; padding:10px">Запази промените</button>
                         </form>
                         <div style="font-size:.74rem;color:var(--muted);margin-top:7px;font-weight:600">
                             Потвърдените места се показват публично като "свободни".

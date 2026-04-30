@@ -1,21 +1,31 @@
 ﻿@model List<Macrofy.Models.Event>
+@using Microsoft.EntityFrameworkCore
+@inject Macrofy.Data.AppDbContext Db
 @{
     ViewData["Title"] = "Събития";
+    var eventChefs = await Db.ChefProfiles
+        .Where(c => c.HasEventBadge)
+        .Include(c => c.User)
+        .ToListAsync();
 }
 
 <div class="dash-page" style="background:var(--bg);min-height:100vh">
-    <div style="max-width:860px;margin:0 auto;padding:40px 20px 80px">
+    <div style="max-width:900px;margin:0 auto;padding:40px 20px 80px">
 
         @foreach (var ev in Model)
         {
-            var spots = ev.ConfirmedSpots;
-            var spotsLeft = ev.MaxSpots - spots;
-            var isRegistered = User.Identity?.IsAuthenticated == true &&
-            ev.Registrations.Any(r => r.UserId == (User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value));
+            var spotsLeft = ev.MaxSpots - ev.ConfirmedSpots;
+            var hasApplied = User.Identity?.IsAuthenticated == true &&
+            ev.Registrations.Any(r => r.UserId ==
+            User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
 
+            <!-- EVENT HERO -->
             <div class="event-hero reveal">
                 <div class="event-badge">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
                     Скоро
                 </div>
                 <h1>@ev.Title</h1>
@@ -23,7 +33,7 @@
                 <div class="event-meta">
                     <div class="event-meta-item">
                         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
-                        @ev.EventDate.ToString("dd MMMM yyyy, HH:mm", new System.Globalization.CultureInfo("bg-BG"))
+                        @ev.EventDate.ToString("dd MMMM yyyy, HH:mm ч.", new System.Globalization.CultureInfo("bg-BG"))
                     </div>
                     <div class="event-meta-item">
                         <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
@@ -38,29 +48,29 @@
                     }
                     else
                     {
-                        <span style="color:var(--lime)">Местата са изчерпани</span>
+                        <span>Местата са изчерпани</span>
                     }
                 </div>
             </div>
 
-            <!-- What to expect -->
-            <div class="card reveal reveal-delay-1" style="margin-bottom:24px">
+            <!-- WHAT TO EXPECT -->
+            <div class="card reveal reveal-delay-1" style="margin-bottom:20px">
                 <h2 style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:var(--teal);margin-bottom:20px;font-weight:400">Какво да очакваш</h2>
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px" class="event-features-grid">
-                    <div style="text-align:center;padding:20px;background:var(--lime-faint);border-radius:var(--r);border:1px solid rgba(141,198,63,.3)">
-                        <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:var(--teal);margin-bottom:6px">2–3</div>
-                        <div style="font-size:.82rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Готвача на живо</div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px" class="event-features-grid">
+                    <div style="text-align:center;padding:20px;background:var(--lime-faint);border-radius:var(--r);border:1.5px solid rgba(141,198,63,.35)">
+                        <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:var(--teal);margin-bottom:6px">2</div>
+                        <div style="font-size:.8rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Готвачи на живо</div>
                     </div>
-                    <div style="text-align:center;padding:20px;background:var(--teal-light);border-radius:var(--r);border:1px solid rgba(27,77,62,.15)">
+                    <div style="text-align:center;padding:20px;background:var(--teal-light);border-radius:var(--r);border:1.5px solid rgba(27,77,62,.18)">
                         <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:var(--teal);margin-bottom:6px">10</div>
-                        <div style="font-size:.82rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Участника</div>
+                        <div style="font-size:.8rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Участници</div>
                     </div>
-                    <div style="text-align:center;padding:20px;background:var(--lime-faint);border-radius:var(--r);border:1px solid rgba(141,198,63,.3)">
+                    <div style="text-align:center;padding:20px;background:var(--lime-faint);border-radius:var(--r);border:1.5px solid rgba(141,198,63,.35)">
                         <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:var(--teal);margin-bottom:6px">100%</div>
-                        <div style="font-size:.82rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Персонализирано</div>
+                        <div style="font-size:.8rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Персонализирано</div>
                     </div>
                 </div>
-                <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;flex-direction:column;gap:10px">
                     <div class="benefit">
                         <div class="b-check"><svg viewBox="0 0 10 7"><polyline points="1 3.5 3.5 6 9 1" /></svg></div>
                         <div class="b-text"><strong>Персонализиран десерт по твоите макроси</strong><p>Готвачите ще приготвят специално за теб десерт, съобразен точно с твоите дневни макронутриенти.</p></div>
@@ -76,58 +86,145 @@
                 </div>
             </div>
 
-            <!-- Registration card -->
-            <div class="card reveal reveal-delay-2" style="border:2px solid @(spotsLeft > 0 ? "var(--lime)" : "var(--border)")">
-                @if (isRegistered)
+            <!-- PARTNERS -->
+            <div class="card reveal reveal-delay-2" style="margin-bottom:20px">
+                <h2 style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:var(--teal);margin-bottom:8px;font-weight:400">Партньори на събитието</h2>
+                <p style="color:var(--muted);font-size:.84rem;font-weight:600;margin-bottom:20px">Събитието се провежда с подкрепата на:</p>
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px" class="event-partners-grid">
+
+                    <!-- Partner Item -->
+                    <div style="border:2px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;display:flex;flex-direction:column;justify-content:space-between;transition:all .2s" class="event-partner-item">
+                        <div style="height:80px; display:flex; align-items:center; justify-content:center; margin-bottom:16px;">
+                            <img src="~/images/hrcacademy.png" alt="HRC Academy" style="max-height:100%; max-width:100%; object-fit:contain;" />
+                        </div>
+                        <div>
+                            <div style="font-weight:800;color:var(--teal);font-size:.88rem;margin-bottom:4px">HRC Culinary Academy</div>
+                            <div style="font-size:.76rem;color:var(--muted);font-weight:600">Кулинарна академия</div>
+                        </div>
+                    </div>
+
+                    <!-- Partner Item -->
+                    <div style="border:2px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;display:flex;flex-direction:column;justify-content:space-between;transition:all .2s" class="event-partner-item">
+                        <div style="height:80px; display:flex; align-items:center; justify-content:center; margin-bottom:16px;">
+                            <img src="~/images/fantastico.png" alt="Fantastico" style="max-height:100%; max-width:100%; object-fit:contain;" />
+                        </div>
+                        <div>
+                            <div style="font-weight:800;color:var(--teal);font-size:.88rem;margin-bottom:4px">Фантастико</div>
+                            <div style="font-size:.76rem;color:var(--muted);font-weight:600">Хранителни продукти</div>
+                        </div>
+                    </div>
+
+                    <!-- Partner Item -->
+                    <div style="border:2px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;display:flex;flex-direction:column;justify-content:space-between;transition:all .2s" class="event-partner-item">
+                        <div style="height:80px; display:flex; align-items:center; justify-content:center; margin-bottom:16px;">
+                            <img src="~/images/myprotein.png" alt="MyProtein" style="max-height:100%; max-width:100%; object-fit:contain;" />
+                        </div>
+                        <div>
+                            <div style="font-weight:800;color:var(--teal);font-size:.88rem;margin-bottom:4px">MyProtein</div>
+                            <div style="font-size:.76rem;color:var(--muted);font-weight:600">Спортно хранене</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- CHEFS WITH BADGE SECTION -->
+            @if (eventChefs != null && eventChefs.Any())
+            {
+                <div class="card reveal reveal-delay-1" style="margin-bottom:20px; padding:24px">
+                    <h2 style="font-family:'Instrument Serif',serif; font-size:1.4rem; color:var(--teal); margin-bottom:20px; font-weight:400">
+                        Готвачи на събитието
+                    </h2>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:16px">
+                        @foreach (var chef in eventChefs)
+                        {
+                            <div style="border:2px solid var(--lime); border-radius:var(--r); padding:20px; text-align:center; background:var(--lime-faint); display:flex; flex-direction:column; align-items:center; min-height:220px; justify-content:center">
+
+                                <!-- Avatar Circle -->
+                                <div style="width:60px; height:60px; min-width:60px; min-height:60px; background:linear-gradient(135deg,var(--teal),var(--teal-mid)); border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:12px; font-family:'Instrument Serif',serif; font-size:1.4rem; color:var(--lime-bright); border:2px solid rgba(141,198,63,.5)">
+                                    @(!string.IsNullOrEmpty(chef.User?.FullName) ? chef.User.FullName[0].ToString().ToUpper() : "?")
+                                </div>
+
+                                <!-- Name -->
+                                <div style="font-weight:900; color:var(--teal); font-size:.92rem; margin-bottom:4px; line-height:1.2">
+                                    @chef.User?.FullName
+                                </div>
+
+                                <!-- Specialties -->
+                                <div style="font-size:.76rem; color:var(--muted); font-weight:600; margin-bottom:12px; min-height:2.4em; display:flex; align-items:center; justify-content:center">
+                                    @chef.Specialties
+                                </div>
+
+                                <!-- Badge Label -->
+                                <div style="background:linear-gradient(135deg,var(--teal),var(--teal-mid)); color:#fff; border-radius:50px; padding:4px 12px; font-size:.68rem; font-weight:900; display:inline-block; letter-spacing:.04em; text-transform:uppercase; line-height:1">
+                                    Възпитаник на HRC Academy
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+
+
+            <!-- REGISTRATION CARD -->
+            <div class="card reveal reveal-delay-3"
+                 style="border:2px solid @(spotsLeft > 0 && !hasApplied ? "var(--lime)" : "var(--border)")">
+                @if (hasApplied)
                 {
                     <div style="text-align:center;padding:20px">
                         <div style="width:60px;height:60px;background:var(--lime-faint);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;border:2px solid var(--lime)">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--lime-dark)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12" /></svg>
                         </div>
-                        <h3 style="color:var(--teal);margin-bottom:6px">Успешно кандидатства!</h3>
-                        <p style="color:var(--muted);font-size:.9rem;font-weight:500">Ще получиш потвърждение на имейла си, ако бъдеш избран.</p>
+                        <h3 style="color:var(--teal);margin-bottom:6px;font-weight:900">Кандидатурата е изпратена!</h3>
+                        <p style="color:var(--muted);font-size:.9rem;font-weight:600">Ще получиш имейл от нас ако бъдеш избран сред участниците.</p>
                     </div>
                 }
                 else if (spotsLeft <= 0)
                 {
                     <div style="text-align:center;padding:20px">
                         <h3 style="color:var(--muted);margin-bottom:6px">Местата са изчерпани</h3>
-                        <p style="color:var(--muted);font-size:.88rem;font-weight:500">Следи за следващо събитие.</p>
+                        <p style="color:var(--muted);font-size:.88rem;font-weight:600">Следи за следващо събитие.</p>
                     </div>
                 }
                 else
                 {
-                    <h3 style="color:var(--teal);margin-bottom:6px;font-size:1.1rem;font-weight:800">Кандидатствай за събитието</h3>
-                    <p style="color:var(--muted);font-size:.86rem;margin-bottom:20px;font-weight:500">Безплатно. Ако бъдеш избран ще получиш имейл от нас за локацията и времето на провеждане. Само <strong style="color:var(--teal)">@spotsLeft места</strong> оставащи.</p>
-
+                    <h3 style="color:var(--teal);margin-bottom:8px;font-size:1.1rem;font-weight:900">Кандидатствай за събитието</h3>
+                    <p style="color:var(--muted);font-size:.86rem;margin-bottom:20px;font-weight:600">
+                        Безплатно. Ще получиш потвърждение ако бъдеш избран.
+                        Само <strong style="color:var(--teal)">@spotsLeft места</strong> оставащи.
+                    </p>
                     @if (User.Identity?.IsAuthenticated != true)
                     {
-                        <p style="font-size:.9rem;color:var(--muted);margin-bottom:16px;font-weight:500">Трябва да влезеш в профила си, за да кандидатстваш.</p>
-                        <div style="display:flex;gap:10px">
+                        <p style="font-size:.9rem;color:var(--muted);margin-bottom:16px;font-weight:600">Трябва да влезеш в профила си, за да кандидатстваш.</p>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap">
                             <a asp-controller="Account" asp-action="Login" class="btn btn-primary">Вход</a>
                             <a asp-controller="Account" asp-action="Register" class="btn btn-secondary">Регистрация</a>
                         </div>
                     }
                     else if (!User.IsInRole("Client"))
                     {
-                        <p style="color:var(--muted);font-size:.88rem;font-weight:500">Само клиенти могат да се записват за събития.</p>
+                        <p style="color:var(--muted);font-size:.88rem;font-weight:600">Само клиенти могат да кандидатстват за събития.</p>
                     }
                     else
                     {
                         <form asp-action="Register" asp-route-id="@ev.Id" method="post">
                             @Html.AntiForgeryToken()
                             <div class="fg">
-                                <label>Имейл за потвърждение</label>
-                                <input type="email" name="contactEmail" value="@User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value" required>
+                                <label>Имейл за връзка</label>
+                                <input type="email" name="contactEmail"
+                                       value="@User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value" required>
                             </div>
                             <div class="fg">
                                 <label>Телефон (по желание)</label>
                                 <input type="tel" name="contactPhone" placeholder="+359 88...">
                             </div>
-                            <div style="background:var(--teal-light);border-radius:var(--r);padding:14px;margin-bottom:16px;font-size:.84rem;color:var(--teal);font-weight:600;border:1px solid rgba(27,77,62,.15)">
+                            <div style="background:var(--teal-light);border-radius:var(--r);padding:14px;margin-bottom:16px;font-size:.84rem;color:var(--teal);font-weight:700;border:1px solid rgba(27,77,62,.15)">
                                 Твоят макро профил ще бъде споделен с готвачите, за да приготвят десерт специално за теб.
                             </div>
-                            <button type="submit" class="form-submit">Запиши се безплатно</button>
+                            <button type="submit" class="form-submit">Кандидатствай</button>
                         </form>
                     }
                 }
@@ -138,7 +235,7 @@
         {
             <div class="empty-state">
                 <h3>Няма предстоящи събития</h3>
-                <p>Следи за скоро.</p>
+                <p>Следи за нови събития.</p>
             </div>
         }
     </div>
@@ -150,8 +247,19 @@
         document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
     </script>
     <style>
+        .chef-event-card:hover {
+            border-color: var(--teal) !important;
+            background: var(--teal-light) !important;
+        }
+
+        .event-partner-item:hover {
+            border-color: var(--lime) !important;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
         @@media(max-width:640px) {
-            .event-features-grid {
+            .event-features-grid, .event-partners-grid {
                 grid-template-columns: 1fr !important;
             }
         }

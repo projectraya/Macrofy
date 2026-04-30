@@ -23,8 +23,16 @@ public class EventController : Controller
 			.Include(e => e.Registrations)
 			.OrderBy(e => e.EventDate)
 			.ToListAsync();
+
+		// Вземаме готвачите с бадж
+		ViewBag.EventChefs = await _db.ChefProfiles
+			.Include(c => c.User)
+			.Where(c => c.HasEventBadge)
+			.ToListAsync();
+
 		return View(events);
 	}
+
 
 	[HttpPost]
 	[Authorize(Roles = "Client")]

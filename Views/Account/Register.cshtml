@@ -2,7 +2,6 @@
 @{ ViewData["Title"] = "Регистрация"; }
 <div class="auth-page">
   <div class="auth-left">
-    <img class="logo-white" src="~/images/logo.png" alt="Macrofy">
     <h2>Започни с Macrofy</h2>
     <p>Създай профил безплатно и се свържи с готвач, който ще превърне хранителните ти цели в реалност.</p>
     <div class="auth-feats">
@@ -20,10 +19,10 @@
         @Html.AntiForgeryToken()
         <div class="fg"><label asp-for="FullName">Пълно Име</label><input asp-for="FullName" placeholder="Иван Иванов"><span asp-validation-for="FullName" class="fv-error"></span></div>
         <div class="fg"><label asp-for="Email">Имейл</label><input asp-for="Email" type="email" placeholder="ivan@email.com"><span asp-validation-for="Email" class="fv-error"></span></div>
-        <div class="form-row">
-          <div class="fg"><label asp-for="Password">Парола</label><input asp-for="Password" type="password" placeholder="••••••••"><span asp-validation-for="Password" class="fv-error"></span></div>
-          <div class="fg"><label asp-for="ConfirmPassword">Потвърди</label><input asp-for="ConfirmPassword" type="password" placeholder="••••••••"><span asp-validation-for="ConfirmPassword" class="fv-error"></span></div>
-        </div>
+                <div class="form-row">
+                    <div class="fg"><label asp-for="Password">Парола</label><input asp-for="Password" type="password" placeholder="••••••••"><span asp-validation-for="Password" class="fv-error"></span></div>
+                    <div class="fg"><label asp-for="ConfirmPassword">Потвърди</label><input asp-for="ConfirmPassword" type="password" placeholder="••••••••"><span asp-validation-for="ConfirmPassword" class="fv-error"></span></div>
+                </div>
         <div class="fg">
           <label asp-for="Role">Регистрирай се като</label>
           <select asp-for="Role">

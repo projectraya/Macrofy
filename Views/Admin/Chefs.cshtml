@@ -1,109 +1,76 @@
 @model List<Macrofy.Models.ChefProfile>
-@{ ViewData["Title"] = "Управление на готвачи"; }
+@{
+    ViewData["Title"] = "Управление на готвачи";
+}
 
 <div class="dash-page">
-  <div class="dash-header">
-    <div style="max-width:1200px;margin:0 auto">
-      <h1>Готвачи (@Model.Count)</h1>
-      <p>Верификация и управление на готвачи.</p>
+    <div class="dash-header">
+        <div style="max-width:1200px;margin:0 auto">
+            <h1>Готвачи (@Model.Count)</h1>
+            <p>Верификация, управление и event бадж за готвачи.</p>
+        </div>
     </div>
-  </div>
-  <div class="dash-content">
-    <div class="card" style="padding:0;overflow:hidden">
-        <table class="tbl chefs-table">
-        <thead><tr><th>Готвач</th><th>Специалност</th><th>Опит</th><th>Рейтинг</th><th>Статус</th><th>Действия</th></tr></thead>
-        <tbody>
-        @foreach (var c in Model)
-        {
-          <tr>
-            <td>
-              <div style="font-weight:600">@c.User?.FullName</div>
-              <div style="font-size:.78rem;color:var(--muted)">@c.User?.Email</div>
-            </td>
-            <td>
-                <div style="max-width:260px">
-                    @c.Specialties
-                </div>
-            </td>
-            <td>@c.ExperienceYears год.</td>
-            <td>★ @c.Rating.ToString("0.0") (@c.TotalReviews)</td>
-            <td>
-              @if (c.IsVerified)
-              { <span class="badge" style="background:var(--lime-faint);color:var(--dark)">Верифициран</span> }
-              else
-              { <span class="badge" style="background:#fef3c7;color:#92400e">Чака</span> }
-            </td>
-            <td>
-              <form asp-action="VerifyChef" method="post" style="display:inline">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" value="@c.Id">
-                <input type="hidden" name="verified" value="@(!c.IsVerified)">
-                <button type="submit" class="btn btn-sm @(c.IsVerified ? "btn-danger" : "btn-primary")">
-                  @(c.IsVerified ? "Премахни верификацията" : "Верифицирай")
-                </button>
-              </form>
-            </td>
-          </tr>
-        }
-        </tbody>
-      </table>
+    <div class="dash-content">
+        <div class="card" style="padding:0; overflow-x:auto;">
+            <table class="tbl" style="width:100%; min-width:1000px; border-collapse:collapse;">
+                <thead>
+                    <tr style="border-bottom:2px solid var(--border)">
+                        <th style="padding:16px; text-align:left; width:20%">Готвач</th>
+                        <th style="padding:16px; text-align:left; width:20%">Специалност</th>
+                        <th style="padding:16px; text-align:left; width:10%">Опит</th>
+                        <th style="padding:16px; text-align:left; width:12%">Рейтинг</th>
+                        <th style="padding:16px; text-align:center; width:12%">Бадж</th>
+                        <th style="padding:16px; text-align:right; width:26%">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr style="border-bottom:1px solid var(--border); vertical-align:middle">
+                            <td style="padding:16px">
+                                <div style="font-weight:800; color:var(--teal); line-height:1.2">@c.User?.FullName</div>
+                                <div style="font-size:.76rem; color:var(--muted)">@c.User?.Email</div>
+                            </td>
+                            <td style="padding:16px; font-size:.85rem; line-height:1.4">@c.Specialties</td>
+                            <td style="padding:16px">@c.ExperienceYears год.</td>
+                            <td style="padding:16px; white-space:nowrap">★ @c.Rating.ToString("0.0") <span style="color:var(--muted); font-size:.8rem">(@c.TotalReviews)</span></td>
+                            <td style="padding:16px; text-align:center">
+                                @if (c.HasEventBadge)
+                                {
+                                    <span class="badge" style="background:linear-gradient(135deg,var(--teal),var(--teal-mid)); color:#fff; font-size:.65rem; padding:4px 8px; border-radius:4px; display:inline-block; line-height:1">
+                                        Да
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span style="color:var(--muted)">–</span>
+                                }
+                            </td>
+                            <td style="padding:16px; text-align:right">
+                                <div style="display:flex; gap:8px; justify-content:flex-end">
+                                    <form asp-action="VerifyChef" method="post" style="margin:0">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@c.Id">
+                                        <input type="hidden" name="verified" value="@(!c.IsVerified)">
+                                        <button type="submit" class="btn" style="padding:6px 12px; font-size:.75rem; border-radius:6px; cursor:pointer; border:1px solid @(c.IsVerified ? "#fee2e2" : "#e2e8f0"); background:@(c.IsVerified ? "#fee2e2" : "#f8fafc"); color:@(c.IsVerified ? "#991b1b" : "#475569")">
+                                            @(c.IsVerified ? "Махни Вериф." : "Верифицирай")
+                                        </button>
+                                    </form>
+
+                                    <form asp-action="ToggleEventBadge" method="post" style="margin:0">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@c.Id">
+                                        <button type="submit" class="btn" style="padding:6px 12px; font-size:.75rem; border-radius:6px; cursor:pointer; border:none; background:@(c.HasEventBadge ? "#f1f5f9" : "var(--teal)"); color:@(c.HasEventBadge ? "#475569" : "#fff")">
+                                            @(c.HasEventBadge ? "Махни Бадж" : "Сложи Бадж")
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
     </div>
-  </div>
 </div>
-
-
-<style>
-    .chefs-table {
-        table-layout: fixed;
-        width: 100%;
-    }
-
-        .chefs-table th,
-        .chefs-table td {
-            padding: 16px 18px;
-            vertical-align: middle;
-        }
-
-            /* ширини на колоните */
-            .chefs-table th:nth-child(1),
-            .chefs-table td:nth-child(1) {
-                width: 25%;
-            }
-
-            .chefs-table th:nth-child(2),
-            .chefs-table td:nth-child(2) {
-                width: 25%;
-            }
-
-            .chefs-table th:nth-child(3),
-            .chefs-table td:nth-child(3) {
-                width: 10%;
-            }
-
-            .chefs-table th:nth-child(4),
-            .chefs-table td:nth-child(4) {
-                width: 15%;
-            }
-
-            .chefs-table th:nth-child(5),
-            .chefs-table td:nth-child(5) {
-                width: 10%;
-            }
-
-            .chefs-table th:nth-child(6),
-            .chefs-table td:nth-child(6) {
-                width: 15%;
-            }
-
-        /* това оправя "смачкването" */
-        .chefs-table td {
-            word-wrap: break-word;
-            white-space: normal;
-        }
-
-            /* специално за специалностите */
-            .chefs-table td:nth-child(2) {
-                line-height: 1.4;
-                color: var(--muted);
-            }
-</style>

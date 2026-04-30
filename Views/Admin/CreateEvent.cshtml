@@ -1,0 +1,111 @@
+﻿@model Macrofy.Models.Event
+@{
+    ViewData["Title"] = (Model?.Id > 0) ? "Редакция на събитие" : "Ново събитие";
+}
+
+<style>
+    .admin-form-group {
+        margin-bottom: 20px;
+    }
+
+        .admin-form-group label {
+            display: block;
+            font-weight: 800;
+            color: var(--teal);
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+    .admin-input {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 10px;
+        border: 2px solid var(--border);
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        background: #fff;
+        box-sizing: border-box; /* Важно: предотвратява излизането на полето от контейнера */
+    }
+
+        .admin-input:focus {
+            border-color: var(--teal);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(27, 77, 62, 0.05);
+        }
+
+    .btn-group {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+    }
+</style>
+
+<div class="dash-page">
+    <div class="dash-header">
+        <div style="max-width:800px; margin:0 auto; padding: 0 20px;">
+            <h1>@ViewData["Title"]</h1>
+        </div>
+    </div>
+
+    <div class="dash-content">
+        <div class="card" style="padding:40px; max-width:600px; margin:0 auto; border-radius: 20px;">
+
+            <form asp-action="@(Model?.Id > 0 ? "EditEvent" : "CreateEvent")" method="post">
+                @Html.AntiForgeryToken()
+                @if (Model?.Id > 0)
+                {
+                    <input type="hidden" asp-for="Id" />
+                }
+
+                <div class="admin-form-group">
+                    <label>Заглавие на събитието</label>
+                    <input asp-for="Title" class="admin-input" placeholder="Напр. Ексклузивна вечер..." />
+                </div>
+
+                <div class="admin-form-group">
+                    <label>Описание</label>
+                    <textarea asp-for="Description" class="admin-input" rows="4" placeholder="Кратко описание..."></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="admin-form-group">
+                        <label>Локация</label>
+                        <input asp-for="Location" class="admin-input" placeholder="Град, адрес" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Дата и час</label>
+                        <input asp-for="EventDate" type="datetime-local" class="admin-input" />
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="admin-form-group">
+                        <label>Максимални места</label>
+                        <input asp-for="MaxSpots" type="number" class="admin-input" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Image URL</label>
+                        <input asp-for="ImageUrl" class="admin-input" placeholder="https://..." />
+                    </div>
+                </div>
+
+                <div class="admin-form-group" style="margin-top: 10px;">
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer; text-transform: none; font-size: 0.95rem;">
+                        <input asp-for="IsActive" style="width:18px; height:18px; accent-color: var(--teal);" />
+                        <span>Това събитие е активно и видимо за потребители</span>
+                    </label>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary" style="flex:2; padding: 14px;">
+                        @(Model?.Id > 0 ? "Запази промените" : "Създай събитие")
+                    </button>
+                    <a asp-action="Events" class="btn btn-secondary" style="flex:1; padding: 14px; text-align:center;">Назад</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

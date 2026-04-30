@@ -25,8 +25,11 @@ public class ChefProfile
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    // Navigation
-    public ICollection<MealPlan> MealPlans { get; set; } = new List<MealPlan>();
+	public bool HasEventBadge { get; set; } = false;
+	public string? EventBadgeLabel { get; set; }
+
+	// Navigation
+	public ICollection<MealPlan> MealPlans { get; set; } = new List<MealPlan>();
     public ICollection<Order> Orders { get; set; } = new List<Order>();
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
 }
