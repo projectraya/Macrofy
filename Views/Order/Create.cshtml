@@ -6,6 +6,59 @@
     var googleApiKey = Configuration?["GoogleMaps:ApiKey"] ?? "";
 }
 
+<style>
+    /* Мобилна оптимизация */
+    .order-grid {
+        display: grid;
+        grid-template-columns: 1fr 360px; /* Десктоп: две колони */
+        gap: 24px;
+        align-items: start;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    @@media (max-width: 992px) {
+        .order-grid
+
+    {
+        grid-template-columns: 1fr; /* Мобилни: една колона */
+    }
+
+    .sidebar-sticky {
+        position: static !important; /* Премахваме sticky за мобилни */
+    }
+
+    .form-row {
+        grid-template-columns: 1fr; /* Датите застават една под друга */
+    }
+
+    .dash-header h1 {
+        font-size: 1.5rem;
+    }
+
+    }
+
+    /* Стил за предложенията за адрес */
+    .addr-item {
+        padding: 12px;
+        cursor: pointer;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.2s;
+    }
+
+        .addr-item:hover {
+            background: var(--bg);
+        }
+
+        .addr-item:last-child {
+            border-bottom: none;
+        }
+</style>
+
 <div class="dash-page">
     <div class="dash-header">
         <div style="max-width:1160px;margin:0 auto">
@@ -15,68 +68,67 @@
     </div>
 
     <div class="dash-content">
-        <div style="display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start">
+        <div class="order-grid">
+            <!-- ЛЯВА КОЛОНА: ФОРМА -->
             <div class="card">
                 <h3 style="color:var(--dark);margin-bottom:22px;font-size:1rem;font-weight:700">Детайли на поръчката</h3>
                 <div asp-validation-summary="ModelOnly" class="val-summary"></div>
+
                 <form asp-action="Create" method="post">
                     @Html.AntiForgeryToken()
                     <input type="hidden" asp-for="ChefProfileId">
                     <input type="hidden" asp-for="ChefName">
                     <input type="hidden" asp-for="HourlyRate">
 
-                    <div class="fg">
-                        <label asp-for="DeliveryAddress">Адрес за доставка</label>
+                    <div class="fg" style="margin-bottom:20px">
+                        <label asp-for="DeliveryAddress" style="display:block;font-weight:700;margin-bottom:8px">Адрес за доставка</label>
                         <div style="position:relative">
                             <input asp-for="DeliveryAddress"
                                    id="addressInput"
+                                   class="form-control"
+                                   style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:var(--rs)"
                                    placeholder="Започни да пишеш адрес в България..."
                                    autocomplete="off">
-                            <div id="addressSuggestions"
-                                 style="display:none;position:absolute;top:100%;left:0;right:0;
-                background:#fff;border:1.5px solid var(--border);border-top:none;
-                border-radius:0 0 var(--rs) var(--rs);z-index:50;
-                box-shadow:var(--shadow-md);max-height:220px;overflow-y:auto"></div>
+                            <div id="addressSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid var(--border);border-top:none;border-radius:0 0 var(--rs) var(--rs);z-index:50;box-shadow:var(--shadow-md);max-height:220px;overflow-y:auto"></div>
                         </div>
                         <span asp-validation-for="DeliveryAddress" class="fv-error"></span>
                     </div>
 
-                    <div class="form-row">
+                    <div class="form-row" style="margin-bottom:20px">
                         <div class="fg">
-                            <label asp-for="StartDate">Начална дата</label>
-                            <input asp-for="StartDate" type="date" id="startDate" oninput="calcTotal()">
-                            <span asp-validation-for="StartDate" class="fv-error"></span>
+                            <label asp-for="StartDate" style="display:block;font-weight:700;margin-bottom:8px">Начална дата</label>
+                            <input asp-for="StartDate" type="date" id="startDate" oninput="calcTotal()" class="form-control" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:var(--rs)">
                         </div>
                         <div class="fg">
-                            <label asp-for="EndDate">Крайна дата</label>
-                            <input asp-for="EndDate" type="date" id="endDate" oninput="calcTotal()">
-                            <span asp-validation-for="EndDate" class="fv-error"></span>
+                            <label asp-for="EndDate" style="display:block;font-weight:700;margin-bottom:8px">Крайна дата</label>
+                            <input asp-for="EndDate" type="date" id="endDate" oninput="calcTotal()" class="form-control" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:var(--rs)">
                         </div>
                     </div>
 
-                    <div class="fg">
-                        <label asp-for="Notes">Бележки (алергии, предпочитания)</label>
-                        <textarea asp-for="Notes" placeholder="Напр. без свинско, алергия към ядки, предпочитам пиле..."></textarea>
+                    <div class="fg" style="margin-bottom:24px">
+                        <label asp-for="Notes" style="display:block;font-weight:700;margin-bottom:8px">Бележки (алергии, предпочитания)</label>
+                        <textarea asp-for="Notes" class="form-control" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:var(--rs);min-height:100px" placeholder="Напр. без свинско, алергия към ядки..."></textarea>
                     </div>
 
-                    <button type="submit" class="form-submit">Изпрати поръчката</button>
+                    <button type="submit" class="btn btn-primary" style="width:100%;padding:16px;font-weight:800;font-size:1rem">Изпрати поръчката</button>
                 </form>
             </div>
 
-            <div style="position:sticky;top:82px;display:flex;flex-direction:column;gap:16px">
-                <div class="card">
+            <!-- ДЯСНА КОЛОНА: SIDEBAR -->
+            <div class="sidebar-sticky" style="position:sticky;top:82px;display:flex;flex-direction:column;gap:16px">
+                <div class="card" style="padding:20px">
                     <div style="font-size:.7rem;font-weight:700;color:var(--lime);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px">Готвач</div>
                     <div style="display:flex;align-items:center;gap:12px">
                         <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--lime),var(--mid));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:1.1rem;color:#fff;flex-shrink:0">@Model.ChefName[0]</div>
                         <div>
-                            <h3 style="color:var(--dark);font-size:.92rem">@Model.ChefName</h3>
+                            <h3 style="color:var(--dark);font-size:.92rem;margin:0">@Model.ChefName</h3>
                             <div style="font-size:.78rem;color:var(--muted)">@Model.HourlyRate лв/ч</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="macro-widget">
-                    <h4>Обобщение</h4>
+                <div class="macro-widget" style="padding:20px;background:var(--teal);color:#fff;border-radius:var(--r)">
+                    <h4 style="margin-bottom:15px;font-size:1rem">Обобщение</h4>
                     <div style="display:flex;flex-direction:column;gap:11px">
                         <div style="display:flex;justify-content:space-between;font-size:.84rem;opacity:.78"><span>Период</span><span id="sumDays">–</span></div>
                         <div style="display:flex;justify-content:space-between;font-size:.84rem;opacity:.78"><span>Ставка</span><span>@Model.HourlyRate лв/ч × 2 ч/ден</span></div>
@@ -91,6 +143,7 @@
         </div>
     </div>
 </div>
+
 
 @section Scripts {
     <script>
