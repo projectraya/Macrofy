@@ -2000,8 +2000,7 @@ footer a {
     }
 
     .auth-page {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
     }
 
     .auth-left {
@@ -2137,6 +2136,22 @@ footer a {
 
     .event-meta {
         gap: 14px;
+    }
+
+    .auth-right {
+        padding: 32px 20px;
+    }
+
+    .auth-box {
+        width: 100%;
+    }
+
+        .auth-box h1 {
+            font-size: 1.6rem;
+        }
+
+    .form-row {
+        grid-template-columns: 1fr;
     }
 }
 

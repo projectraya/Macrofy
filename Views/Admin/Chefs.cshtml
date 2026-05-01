@@ -51,11 +51,14 @@
                                     <form asp-action="VerifyChef" method="post" style="margin:0">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="id" value="@c.Id">
-                                        <input type="hidden" name="verified" value="@(!c.IsVerified)">
+
+                                        <input type="hidden" name="verified" value="@((!c.IsVerified).ToString().ToLower())">
+
                                         <button type="submit" class="btn" style="padding:6px 12px; font-size:.75rem; border-radius:6px; cursor:pointer; border:1px solid @(c.IsVerified ? "#fee2e2" : "#e2e8f0"); background:@(c.IsVerified ? "#fee2e2" : "#f8fafc"); color:@(c.IsVerified ? "#991b1b" : "#475569")">
                                             @(c.IsVerified ? "Махни Вериф." : "Верифицирай")
                                         </button>
                                     </form>
+
 
                                     <form asp-action="ToggleEventBadge" method="post" style="margin:0">
                                         @Html.AntiForgeryToken()

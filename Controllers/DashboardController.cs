@@ -13,105 +13,105 @@ namespace Macrofy.Controllers;
 [Authorize]
 public class DashboardController : Controller
 {
-    private readonly AppDbContext _db;
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly MacroCalculatorService _macroCalc;
+	private readonly AppDbContext _db;
+	private readonly UserManager<ApplicationUser> _userManager;
+	private readonly MacroCalculatorService _macroCalc;
 
-    public DashboardController(AppDbContext db, UserManager<ApplicationUser> um, MacroCalculatorService mc)
-    {
-        _db = db; _userManager = um; _macroCalc = mc;
-    }
+	public DashboardController(AppDbContext db, UserManager<ApplicationUser> um, MacroCalculatorService mc)
+	{
+		_db = db; _userManager = um; _macroCalc = mc;
+	}
 
-    public async Task<IActionResult> Index()
-    {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null) return RedirectToAction("Login", "Account");
+	public async Task<IActionResult> Index()
+	{
+		var user = await _userManager.GetUserAsync(User);
+		if (user == null) return RedirectToAction("Login", "Account");
 
-        // Route by role
-        if (user.Role == UserRole.Chef) return RedirectToAction("Index", "Chef");
-        if (user.Role == UserRole.Admin) return RedirectToAction("Index", "Admin");
+		// Route by role
+		if (user.Role == UserRole.Chef) return RedirectToAction("Index", "Chef");
+		if (user.Role == UserRole.Admin) return RedirectToAction("Index", "Admin");
 
-        var recentOrders = await _db.Orders
-            .Where(o => o.ClientId == user.Id)
-            .Include(o => o.ChefProfile).ThenInclude(c => c.User)
-            .OrderByDescending(o => o.CreatedAt)
-            .Take(5)
-            .Select(o => new OrderViewModel
-            {
-                Id = o.Id,
-                ChefName = o.ChefProfile.User.FullName,
-                ClientName = user.FullName,
-                Status = o.Status,
-                StartDate = o.StartDate,
-                EndDate = o.EndDate,
-                TotalPrice = o.TotalPrice,
-                Notes = o.Notes,
-                CreatedAt = o.CreatedAt
-            }).ToListAsync();
+		var recentOrders = await _db.Orders
+			.Where(o => o.ClientId == user.Id)
+			.Include(o => o.ChefProfile).ThenInclude(c => c.User)
+			.OrderByDescending(o => o.CreatedAt)
+			.Take(5)
+			.Select(o => new OrderViewModel
+			{
+				Id = o.Id,
+				ChefName = o.ChefProfile.User.FullName,
+				ClientName = user.FullName,
+				Status = o.Status,
+				StartDate = o.StartDate,
+				EndDate = o.EndDate,
+				TotalPrice = o.TotalPrice,
+				Notes = o.Notes,
+				CreatedAt = o.CreatedAt
+			}).ToListAsync();
 
-        // Active chef (latest confirmed order)
-        var activeOrder = await _db.Orders
-            .Where(o => o.ClientId == user.Id && o.Status == OrderStatus.Confirmed)
-            .Include(o => o.ChefProfile).ThenInclude(c => c.User)
-            .OrderByDescending(o => o.CreatedAt)
-            .FirstOrDefaultAsync();
+		// Active chef (latest confirmed order)
+		var activeOrder = await _db.Orders
+			.Where(o => o.ClientId == user.Id && o.Status == OrderStatus.Confirmed)
+			.Include(o => o.ChefProfile).ThenInclude(c => c.User)
+			.OrderByDescending(o => o.CreatedAt)
+			.FirstOrDefaultAsync();
 
-        ChefCardViewModel? assignedChef = null;
-        if (activeOrder != null)
-        {
-            var cp = activeOrder.ChefProfile;
-            assignedChef = new ChefCardViewModel
-            {
-                Id = cp.Id,
-                FullName = cp.User.FullName,
-                Bio = cp.Bio,
-                Specialties = cp.Specialties,
-                Rating = cp.Rating,
-                TotalReviews = cp.TotalReviews,
-                IsAvailable = cp.IsAvailable,
-                IsVerified = cp.IsVerified,
-                Location = cp.Location,
-                HourlyRate = cp.HourlyRate,
-                Specialty = cp.Specialty
-            };
-        }
+		ChefCardViewModel? assignedChef = null;
+		if (activeOrder != null)
+		{
+			var cp = activeOrder.ChefProfile;
+			assignedChef = new ChefCardViewModel
+			{
+				Id = cp.Id,
+				FullName = cp.User.FullName,
+				Bio = cp.Bio,
+				Specialties = cp.Specialties,
+				Rating = cp.Rating,
+				TotalReviews = cp.TotalReviews,
+				IsAvailable = cp.IsAvailable,
+				IsVerified = cp.IsVerified,
+				Location = cp.Location,
+				HourlyRate = cp.HourlyRate,
+				Specialty = cp.Specialty
+			};
+		}
 
-        var availableChefs = await _db.ChefProfiles
-            .Where(c => c.IsVerified && c.IsAvailable)
-            .Include(c => c.User)
-            .Take(6)
-            .Select(c => new ChefCardViewModel
-            {
-                Id = c.Id,
-                FullName = c.User.FullName,
-                Bio = c.Bio,
-                Specialties = c.Specialties,
-                ExperienceYears = c.ExperienceYears,
-                Rating = c.Rating,
-                TotalReviews = c.TotalReviews,
-                IsAvailable = c.IsAvailable,
-                IsVerified = c.IsVerified,
-                Location = c.Location,
-                HourlyRate = c.HourlyRate,
-                Specialty = c.Specialty
-            }).ToListAsync();
+		var availableChefs = await _db.ChefProfiles
+			.Where(c => c.IsVerified && c.IsAvailable)
+			.Include(c => c.User)
+			.Take(6)
+			.Select(c => new ChefCardViewModel
+			{
+				Id = c.Id,
+				FullName = c.User.FullName,
+				Bio = c.Bio,
+				Specialties = c.Specialties,
+				ExperienceYears = c.ExperienceYears,
+				Rating = c.Rating,
+				TotalReviews = c.TotalReviews,
+				IsAvailable = c.IsAvailable,
+				IsVerified = c.IsVerified,
+				Location = c.Location,
+				HourlyRate = c.HourlyRate,
+				Specialty = c.Specialty
+			}).ToListAsync();
 
-        var vm = new ClientDashboardViewModel
-        {
-            FullName = user.FullName,
-            HasMacroProfile = user.DailyCalories.HasValue,
-            Calories = user.DailyCalories,
-            Protein = user.DailyProtein,
-            Carbs = user.DailyCarbs,
-            Fat = user.DailyFat,
-            DietaryPreference = user.DietaryPreference,
-            RecentOrders = recentOrders,
-            AvailableChefs = availableChefs,
-            AssignedChef = assignedChef
-        };
+		var vm = new ClientDashboardViewModel
+		{
+			FullName = user.FullName,
+			HasMacroProfile = user.DailyCalories.HasValue,
+			Calories = user.DailyCalories,
+			Protein = user.DailyProtein,
+			Carbs = user.DailyCarbs,
+			Fat = user.DailyFat,
+			DietaryPreference = user.DietaryPreference,
+			RecentOrders = recentOrders,
+			AvailableChefs = availableChefs,
+			AssignedChef = assignedChef
+		};
 
-        return View(vm);
-    }
+		return View(vm);
+	}
 
 	[HttpGet]
 	public async Task<IActionResult> MacroProfile(string? returnUrl = null)
@@ -192,36 +192,36 @@ public class DashboardController : Controller
 
 		if (Enum.TryParse<DietaryPreference>(ManualDiet, out var diet))
 			user.DietaryPreference = diet;
-		user.AllergyList = HasAllergies
-	? ManualAllergies
-	: null;
+		user.AllergyList = HasAllergies ? ManualAllergies : null;
 
 		await _userManager.UpdateAsync(user);
 		TempData["Success"] = "Макросите са запазени!";
 		return RedirectToAction("Index");
 	}
 
+	// ✅ FIXED: Removed minRating parameter and filter logic
 	[HttpGet]
 	public async Task<IActionResult> Chefs(
-	string? specialty = null,
-	string? minRating = null,
-	string? available = null,
-	string? sortBy = "rating")
+		string? specialty = null,
+		string? available = null,
+		string? sortBy = "rating")
 	{
 		var query = _db.ChefProfiles
 			.Where(c => c.IsVerified)
 			.Include(c => c.User)
 			.AsQueryable();
 
+		// Filter by specialty
 		if (!string.IsNullOrEmpty(specialty) && Enum.TryParse<ChefSpecialty>(specialty, out var sp))
 			query = query.Where(c => c.Specialty == sp);
 
-		if (!string.IsNullOrEmpty(minRating) && decimal.TryParse(minRating, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var minR))
-			query = query.Where(c => c.Rating >= minR);
+		// ✅ REMOVED: minRating filter
 
+		// Filter by availability
 		if (available == "true")
 			query = query.Where(c => c.IsAvailable);
 
+		// Sorting
 		query = sortBy switch
 		{
 			"experience" => query.OrderByDescending(c => c.ExperienceYears),
@@ -247,35 +247,34 @@ public class DashboardController : Controller
 		}).ToListAsync();
 
 		ViewBag.FilterSpecialty = specialty;
-		ViewBag.FilterMinRating = minRating;
 		ViewBag.FilterAvailable = available;
 		ViewBag.FilterSortBy = sortBy;
 		return View(chefs);
 	}
 
 	[HttpGet]
-    public async Task<IActionResult> Orders()
-    {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null) return Unauthorized();
+	public async Task<IActionResult> Orders()
+	{
+		var user = await _userManager.GetUserAsync(User);
+		if (user == null) return Unauthorized();
 
-        var orders = await _db.Orders
-            .Where(o => o.ClientId == user.Id)
-            .Include(o => o.ChefProfile).ThenInclude(c => c.User)
-            .OrderByDescending(o => o.CreatedAt)
-            .Select(o => new OrderViewModel
-            {
-                Id = o.Id,
-                ChefName = o.ChefProfile.User.FullName,
-                ClientName = user.FullName,
-                Status = o.Status,
-                StartDate = o.StartDate,
-                EndDate = o.EndDate,
-                TotalPrice = o.TotalPrice,
-                Notes = o.Notes,
-                CreatedAt = o.CreatedAt
-            }).ToListAsync();
+		var orders = await _db.Orders
+			.Where(o => o.ClientId == user.Id)
+			.Include(o => o.ChefProfile).ThenInclude(c => c.User)
+			.OrderByDescending(o => o.CreatedAt)
+			.Select(o => new OrderViewModel
+			{
+				Id = o.Id,
+				ChefName = o.ChefProfile.User.FullName,
+				ClientName = user.FullName,
+				Status = o.Status,
+				StartDate = o.StartDate,
+				EndDate = o.EndDate,
+				TotalPrice = o.TotalPrice,
+				Notes = o.Notes,
+				CreatedAt = o.CreatedAt
+			}).ToListAsync();
 
-        return View(orders);
-    }
+		return View(orders);
+	}
 }
