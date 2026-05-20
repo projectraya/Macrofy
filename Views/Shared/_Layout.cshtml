@@ -11,9 +11,9 @@
 </head>
 <body>
 
-<div class="announce-bar" id="announceBar">
+@* <div class="announce-bar" id="announceBar">
         <a asp-controller="Event" asp-action="Index">Запиши се</a> за нашето ексклузивно събитие!
-</div>
+</div> *@
 
 <nav class="navbar" id="navbar">
   <div class="nav-inner">
@@ -144,5 +144,16 @@ const toast = document.getElementById('toast');
 if (toast) setTimeout(() => toast.classList.add('hide'), 4500);
 </script>
 @await RenderSectionAsync("Scripts", required: false)
+
+    
 </body>
+
+<footer>
+    <div class="foot-inner">
+        <div>
+            © @DateTime.Now.Year Macrofy. Всички права запазени.
+            <a asp-controller="Home" asp-action="Terms">Общи условия</a>
+        </div>
+    </div>
+</footer>
 </html>

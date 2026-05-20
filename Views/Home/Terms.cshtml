@@ -1,0 +1,137 @@
+﻿@{
+    ViewData["Title"] = "Общи условия";
+}
+
+<div class="pub-page">
+    <div class="pub-sec">
+        <div style="max-width:800px;margin:0 auto">
+            <h1 style="font-family:'Instrument Serif',serif;font-size:2.4rem;color:var(--teal);margin-bottom:20px">Общи условия за ползване</h1>
+            <p style="color:var(--muted);margin-bottom:40px;font-size:.9rem">Последна актуализация: @DateTime.Now.ToString("dd MMMM yyyy")</p>
+
+            <div style="line-height:1.8;color:var(--text)">
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">1. Приемане на условията</h2>
+                <p style="margin-bottom:16px">
+                    Чрез достъпа и използването на платформата Macrofy, Вие се съгласявате да спазвате настоящите общи условия.
+                    Ако не сте съгласни с тези условия, моля, не използвайте услугата.
+                </p>
+
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">2. Описание на услугата</h2>
+                <p style="margin-bottom:16px">
+                    Macrofy е платформа, която свързва клиенти, търсещи персонализирани хранителни решения,
+                    с верифицирани готвачи, специализирани в различни хранителни режими и диети.
+                </p>
+
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">3. Регистрация и профил</h2>
+                <p style="margin-bottom:8px">При регистрация се задължавате да:</p>
+                <ul style="margin:12px 0 16px 24px;list-style:disc">
+                    <li>Предоставяте точна и актуална информация</li>
+                    <li>Поддържате сигурността на вашата парола</li>
+                    <li>Уведомявате ни незабавно за неоторизиран достъп</li>
+                    <li>Носите отговорност за всички действия под вашия акаунт</li>
+                </ul>
+
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">4. Отговорности на клиентите</h2>
+                <p style="margin-bottom:8px">Като клиент, Вие се задължавате:</p>
+                <ul style="margin:12px 0 16px 24px;list-style:disc">
+                    <li>Да предоставяте точна информация за алергии и хранителни ограничения</li>
+                    <li>Да заплащате навременно договорените суми</li>
+                    <li>Да третирате готвачите с уважение и професионализъм</li>
+                    <li>Да спазвате договорените срокове и условия</li>
+                </ul>
+
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">5. Отговорности на готвачите</h2>
+                <p style="margin-bottom:8px">Като готвач, Вие се задължавате:</p>
+                <ul style="margin:12px0 16px 24px;list-style:disc">
+                    <li>Да притежавате необходимите сертификати и разрешителни</li>
+                    <li>Да спазвате всички санитарни норми и стандарти</li>
+                    <li>Да предоставяте услуги съгласно договореното</li>
+                    <li>Да информирате клиентите за всички съставки в храната</li>
+                    <li>Да поддържате високи стандарти на хигиена и качество</li>
+                </ul>
+
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">6. Плащания и такси</h2>
+                <p style="margin-bottom:16px">
+                    Всички цени са в български лева (BGN). Macrofy задържа комисионна от <%= "15" %>% от стойността на всяка транзакция
+                    за поддръжка и развитие на платформата. Плащанията се извършват чрез платформата и се обработват сигурно.
+                </p>
+
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">7. Анулиране и възстановяване</h2>
+                <p style="margin-bottom:8px">Политика за анулиране:</p>
+                <ul style="margin:12px 0 16px 24px;list-style:disc">
+                    <li>Анулиране повече от 48 часа предварително - пълно възстановяване</li>
+                    <li>Анулиране 24-48 часа предварително - 50% възстановяване</li>
+                    <li>Анулиране под 24 часа - без възстановяване</li>
+                </ul>
+
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">8. Поверителност на данните</h2>
+                <p style="margin-bottom:16px">
+                    Вашата поверителност е важна за нас. Прочетете нашата <a asp-action="Privacy" style="color:var(--teal);text-decoration:underline">Политика за поверителност</a>
+                    за информация как събираме, използваме и защитаваме вашите лични данни.
+                </p>
+
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">9. Интелектуална собственост</h2>
+                <p style="margin-bottom:16px">
+                    Всички права върху съдържанието, дизайна и функционалността на Macrofy са запазени.
+                    Забранено е копирането, разпространението или модифицирането без писмено разрешение.
+                </p>
+
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">10. Ограничение на отговорността</h2>
+                <p style="margin-bottom:16px">
+                    Macrofy действа като посредник между клиенти и готвачи. Не носим отговорност за:
+                </p>
+                <ul style="margin:12px 0 16px 24px;list-style:disc">
+                    <li>Качеството на предоставените услуги от готвачите</li>
+                    <li>Хранителни алергии или здравословни проблеми</li>
+                    <li>Спорове между клиенти и готвачи</li>
+                    <li>Загуба на данни или технически проблеми</li>
+                </ul>
+
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">11. Забранено поведение</h2>
+                <p style="margin-bottom:8px">Забранява се:</p>
+                <ul style="margin:12px 0 16px 24px;list-style:disc">
+                    <li>Измама, подвеждаща или незаконна дейност</li>
+                    <li>Заобикаляне на системата за плащане</li>
+                    <li>Споделяне на вашите данни за достъп с трети лица</li>
+                    <li>Нарушаване правата на други потребители</li>
+                    <li>Качване на неподходящо или незаконно съдържание</li>
+                </ul>
+
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">12. Прекратяване на акаунт</h2>
+                <p style="margin-bottom:16px">
+                    Запазваме си правото да спрем или премахнем акаунти, които нарушават тези условия,
+                    без предизвестие и без задължение за възстановяване на средства.
+                </p>
+
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">13. Промени в условията</h2>
+                <p style="margin-bottom:16px">
+                    Запазваме си правото да актуализираме тези условия по всяко време.
+                    Промените влизат в сила веднага след публикуване. Продължаването на използването
+                    на платформата след промени означава приемане на новите условия.
+                </p>
+
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">14. Приложимо право</h2>
+                <p style="margin-bottom:16px">
+                    Тези общи условия се регулират от законодателството на Република България.
+                    Всички спорове ще се решават в българските съдилища.
+                </p>
+
+                <h2 style="color:var(--teal);font-size:1.4rem;margin:32px 0 16px">15. Контакт</h2>
+                <p style="margin-bottom:16px">
+                    При въпроси относно тези общи условия, моля свържете се с нас:
+                </p>
+                <ul style="margin:12px 0 16px 24px;list-style:none">
+                    <li><strong>Имейл:</strong> macrofyhelp@gmail.com</li>
+                </ul>
+
+                <div style="background:var(--lime-faint);border:2px solid var(--lime);border-radius:var(--r);padding:20px;margin-top:40px">
+                    <p style="font-weight:700;color:var(--teal);margin-bottom:8px">⚠️ Важно</p>
+                    <p style="font-size:.88rem;color:var(--muted);line-height:1.7">
+                        Използването на платформата Macrofy означава, че сте прочели, разбрали и приели
+                        всички посочени по-горе общи условия. Ако имате въпроси или притеснения,
+                        моля свържете се с нас преди да използвате услугата.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

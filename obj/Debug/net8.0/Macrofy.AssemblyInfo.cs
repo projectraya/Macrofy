@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Macrofy")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4ca6fa7f0427cb1cee3a79f41421d1b92dbde7f9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+acf3066d92056681040e17b746b20bb24f287959")]
 [assembly: System.Reflection.AssemblyProductAttribute("Macrofy")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Macrofy")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
